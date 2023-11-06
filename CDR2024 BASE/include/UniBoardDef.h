@@ -1,5 +1,7 @@
 #define TIR 8
 
+#define EN 46
+
 #define STEP1 14
 #define STEP2 12
 #define STEP3 10
