@@ -35,6 +35,6 @@ void loop() {
     if (digitalRead(TIR) == 0) {
         digitalWrite(EN, LOW);
         NEMAL.move(10000);
-        NEMAR.move(10000); // test
+        NEMAR.move(10000);
     }
 }
