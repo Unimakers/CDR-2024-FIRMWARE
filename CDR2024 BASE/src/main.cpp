@@ -3,7 +3,7 @@
 #include <HardwareSerial.h>
 #include <AccelStepper.h>
 #include <UniBoardDef.h>
-//
+
 
 #define RXD1 17
 #define TXD1 18
@@ -37,6 +37,9 @@ void reset_point(){
   mesure.quality = 0;
 }
 
+
+//allow tp turn on the led 
+//call with 1 to turn on and 0 to turn off
 void led(int statue){
   if(statue == 1){
     digitalWrite(47, HIGH);
