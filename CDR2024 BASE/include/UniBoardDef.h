@@ -17,3 +17,8 @@
 #define SDA 5
 #define SCL 4
 
+#define QUALITY 8 // quality of the current measurement of the lidar
+#define SPEED_MOTOR_LIDAR 120 // speed of the motor of the lidar (max 255)
+#define RPLIDAR_MOTOR 3 // The PWM pin for control the speed of RPLIDAR's motor.
+#define MAX_DISTANCE_LIDAR 3500 // max distance of the lidar in mm
+#define DIST_OBSTACLE 300 // distance of the obstacle in mm
