@@ -3,6 +3,9 @@
 #include <HardwareSerial.h>
 #include <AccelStepper.h>
 #include <UniBoardDef.h>
+#include <chrono>
+#include <time.h>
+#include <chrono.h>
 
 // You need to create an driver instance 
 RPLidar lidar;
@@ -21,15 +24,19 @@ typedef struct {
     float quality = 0;
 }STRUCT_LIDAR_MESURE;
 
+
+
 STRUCT_LIDAR_MESURE mesure;
 
 int status_obstacle = 0;
 
-/*void reset_point() {
+
+
+void reset_point() {
     mesure.distance = 0;
     mesure.angle = 0;
     mesure.quality = 0;
-}*/
+}
 
 //allow tp turn on the led 
 //call with 1 to turn on and 0 to turn off
@@ -43,43 +50,69 @@ void led(int statue) {
     }
 }
 
-bool obstacle() {
-    if (mesure.distance < DIST_OBSTACLE && mesure.distance > 50) {
-        if (mesure.angle < 200 && mesure.angle > 160) {
-            led(1);
-            //delay(50);
-            return true;
-        }
-        if (mesure.angle > 340 || mesure.angle < 20) {
-            led(1);
-            //delay(50);
-            return true;
-        }
-        return false;
+
+int ANGLE_IN_RANGE() {
+    if ((mesure.angle >= 160 && mesure.angle <= 200) || (mesure.angle >= 340 || mesure.angle <= 20)) {
+        return true;
     }
-    led(0);
     return false;
 }
 
-bool check_target(int dist_target, int angle_to_check) {
-    if (mesure.distance < dist_target + 100 && mesure.distance > dist_target - 100) {
-        if (mesure.angle < angle_to_check + 10 && mesure.angle > angle_to_check - 10) {
-            led(1);
-            //delay(50);
-            return true ;
-        }
+void obstacle() {
+    if (mesure.distance < DIST_OBSTACLE && mesure.distance > 50) {
+      if(check_chrono()==0){
+        start_chrono();
+      }else if(check_chrono()<TIME_TO_CHANGE) {
+        led(1);
+        reinitialise_chrono();
+        start_chrono();
+      }else {
+        reinitialise_chrono();
+        start_chrono();
+        led(0);
+      }
+    }else if(check_chrono()>TIME_TO_CHANGE){
+        led(0);
+        stop_chrono();
+        reinitialise_chrono();
     }
-    led(0);
-    return false;
 }
+
+// bool check_target(int dist_target, int angle_to_check) {
+//     if (mesure.distance < dist_target + 100 && mesure.distance > dist_target - 100) {
+//         if (mesure.angle < angle_to_check + 10 && mesure.angle > angle_to_check - 10) {
+//             led(1);
+//             //delay(50);
+//             return true ;
+//         }
+//     }
+//     led(0);
+//     return false;
+// }
+
+void clignoter() {
+    int i =0;
+    for(i = 0; i < 5; i++){
+    led(1);
+    delay(50);
+    led(0);
+    delay(50);
+    }
+    
+}
+
 
 void get_point_lidar() {
     if (IS_OK(lidar.waitPoint())) { //check if the lidar is connected
+      mesure.angle = lidar.getCurrentPoint().angle; //anglue value in degree
+      if(ANGLE_IN_RANGE()){
         mesure.distance = lidar.getCurrentPoint().distance; //distance value in mm unit
         mesure.quality = lidar.getCurrentPoint().quality;
-        if (mesure.distance < MAX_DISTANCE_LIDAR && mesure.quality > QUALITY) {
-            mesure.angle = lidar.getCurrentPoint().angle; //anglue value in degree
-            obstacle();
+        if(mesure.quality > QUALITY){
+          obstacle();
+        }else{
+          reset_point();
+        }
         }
     } else { //if the lidar is not connected
         analogWrite(RPLIDAR_MOTOR, 0); //stop the rplidar motor
@@ -146,6 +179,7 @@ void setup() {
     }
 
 void loop() {
+
     while (status_obstacle == 0) {
         NEMAL.run();
         NEMAR.run();  
