@@ -1,20 +1,18 @@
+#pragma once
 #ifndef _IHM_H
 #define _IHM_H
 #endif
 
-#pragma once
+#include <Arduino.h>
+#include <UniBoardDef.h>
+
+
 
 class IHM{
     public:
         IHM();
-        bool getTirrette();
-        bool getButton();
-
-
-
-
-
-
-
+        ~IHM();
+        bool GetTirette();
+        bool GetButton(int btn);
 
 };

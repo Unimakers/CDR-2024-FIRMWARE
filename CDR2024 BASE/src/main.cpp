@@ -7,6 +7,7 @@
 #include <time.h>
 #include <chrono.h>
 #include <motion.h>
+#include <ihm.h>
 
 
 
@@ -38,7 +39,10 @@ RPLidar lidar;
 AccelStepper NEMAL(AccelStepper::DRIVER, STEP1, DIR1);
 AccelStepper NEMAR(AccelStepper::DRIVER, STEP2, DIR2);
 
-Motion Robot(&NEMAL,&NEMAR) ;
+//intialise the wrapper
+Motion Robot(NEMAL,NEMAR);
+
+IHM Physical;
 
 HardwareSerial mySerial (1);
 
@@ -49,8 +53,6 @@ typedef struct {
     //bool startBit;
     float quality = 0;
 }STRUCT_LIDAR_MESURE;
-
-
 
 STRUCT_LIDAR_MESURE mesure;
 
@@ -116,16 +118,6 @@ void obstacle() {
 //     return false;
 // }
 
-void clignoter() {
-    int i =0;
-    for(i = 0; i < 5; i++){
-    led(1);
-    delay(50);
-    led(0);
-    delay(50);
-    }
-    
-}
 
 
 void get_point_lidar() {
@@ -170,15 +162,21 @@ void print_mesure() {
     Serial.println("|xy");
 }
 
-void setup() {
 
-    pinMode(TIR, INPUT_PULLUP);
+
+void setup() {
+    //pinMode(TIR, INPUT_PULLUP); // done in physical library
+
+    //Initialise the Enable of the stepper drivers
     pinMode(EN, OUTPUT);
     digitalWrite(EN, HIGH);
+
+
     // bind the RPLIDAR driver to the arduino hardware serial
+
     pinMode(47, OUTPUT);
     digitalWrite(47, HIGH);
-    delay(3000);
+    delay(2000); // why?
     digitalWrite(47, LOW);
     lidar.begin(mySerial);
     Serial.begin(115200);
@@ -188,31 +186,36 @@ void setup() {
     Serial.println("Begin code");
     delay(2000);
 
-    // Bind steppers
+    // inialise steppers
 
 
-    NEMAL.setMaxSpeed(4000.0);
-    NEMAL.setAcceleration(2000.0);
-    NEMAR.setMaxSpeed(4000.0);
-    NEMAR.setAcceleration(2000.0);
+    //NEMAL.setMaxSpeed(4000.0);
+    //NEMAL.setAcceleration(2000.0);
+    //NEMAR.setMaxSpeed(4000.0);
+    //NEMAR.setAcceleration(2000.0);
+
+    
+    Robot.SetMaxAcceleration(2000.0);
+    Robot.SetSpeed(4000.0);
 
     Serial.println("Waiting for button press");
-    while (digitalRead(TIR) == 1){
-
-        delay(1000);
+    while (Physical.GetTirette()){
+        delay(1000); // a ennlever, c'est pour eviter le debug qui devient immense
         Serial.println("J'attend");
     }
-    NEMAL.moveTo(1000000);
-    NEMAR.moveTo(-1000000);
-    //Robot.MoveLine();
+    //NEMAL.moveTo(1000000);
+    //NEMAR.moveTo(-1000000);
+    Robot.MoveLine(100);
+
     digitalWrite(EN, LOW);
     Serial.println("Steppers start");
     xTaskCreatePinnedToCore(LidarTask, "lidarTask", 10000, NULL, 0, NULL, 0);
-    }
+}
 
 void loop() {
     while (status_obstacle == 0) {
-        NEMAL.run();
-        NEMAR.run();  
+        // NEMAL.run();
+        // NEMAR.run();  
+        Robot.Run();
     }
 }
