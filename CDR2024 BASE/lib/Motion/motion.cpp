@@ -1,23 +1,22 @@
 #include "motion.h"
-#include <AccelStepper.h>
 
 
 
-motion::motion(AccelStepper &L, AccelStepper &R)
+Motion::Motion(AccelStepper *L, AccelStepper *R)
 {
     //get the two motors
-    left = &L;
-    right = &R;
+    left = L;
+    right = R;
 }
 
-motion::~motion()
+Motion::~Motion()
 {
 }
 
-void MoveLine(){
+void Motion::MoveLine(){
     
-    left.moveTo();
-    right.moveTo();
+    *left.moveTo(100);
+    right->moveTo(-100);
 
 
 }

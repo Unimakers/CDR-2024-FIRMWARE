@@ -1,18 +1,21 @@
-#ifndef _MOTION_H
-#define _MOTION_H
-#endif
-
 #pragma once
+#include <AccelStepper.h>
+
+// #ifndef _MOTION_H
+// #define _MOTION_H
+// #endif
 
 
-class motion
+
+
+class Motion
 {
 private:
     AccelStepper *left, *right;
 
 public:
-    motion(AccelStepper &L, AccelStepper &R);
-    ~motion();
+    Motion(AccelStepper *L, AccelStepper *R);
+    ~Motion();
     void MoveLine();
     void MoveArc();
     void Turn();

@@ -6,6 +6,7 @@
 #include <chrono>
 #include <time.h>
 #include <chrono.h>
+#include <motion.h>
 
 
 
@@ -36,6 +37,8 @@ RPLidar lidar;
 // Steppers left and right
 AccelStepper NEMAL(AccelStepper::DRIVER, STEP1, DIR1);
 AccelStepper NEMAR(AccelStepper::DRIVER, STEP2, DIR2);
+
+Motion Robot(&NEMAL,&NEMAR) ;
 
 HardwareSerial mySerial (1);
 
@@ -201,13 +204,13 @@ void setup() {
     }
     NEMAL.moveTo(1000000);
     NEMAR.moveTo(-1000000);
+    //Robot.MoveLine();
     digitalWrite(EN, LOW);
     Serial.println("Steppers start");
     xTaskCreatePinnedToCore(LidarTask, "lidarTask", 10000, NULL, 0, NULL, 0);
     }
 
 void loop() {
-
     while (status_obstacle == 0) {
         NEMAL.run();
         NEMAR.run();  
