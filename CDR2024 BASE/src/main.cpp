@@ -7,6 +7,29 @@
 #include <time.h>
 #include <chrono.h>
 
+
+
+
+
+// d8888b. db    db db       .d8b.  d8b   db      d8888b. d88888b      d8888b. d8888b. d88888b d888888b  .d8b.   d888b  d8b   db d88888b 
+// 88  `8D `8b  d8' 88      d8' `8b 888o  88      88  `8D 88'          88  `8D 88  `8D 88'     `~~88~~' d8' `8b 88' Y8b 888o  88 88'     
+// 88   88  `8bd8'  88      88ooo88 88V8o 88      88   88 88ooooo      88oooY' 88oobY' 88ooooo    88    88ooo88 88      88V8o 88 88ooooo 
+// 88   88    88    88      88~~~88 88 V8o88      88   88 88~~~~~      88~~~b. 88`8b   88~~~~~    88    88~~~88 88  ooo 88 V8o88 88~~~~~ 
+// 88  .8D    88    88booo. 88   88 88  V888      88  .8D 88.          88   8D 88 `88. 88.        88    88   88 88. ~8~ 88  V888 88.     
+// Y8888D'    YP    Y88888P YP   YP VP   V8P      Y8888D' Y88888P      Y8888P' 88   YD Y88888P    YP    YP   YP  Y888P  VP   V8P Y88888P 
+                                                                                                                                      
+                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
 // You need to create an driver instance 
 RPLidar lidar;
  
@@ -145,6 +168,10 @@ void print_mesure() {
 }
 
 void setup() {
+
+    pinMode(TIR, INPUT_PULLUP);
+    pinMode(EN, OUTPUT);
+    digitalWrite(EN, HIGH);
     // bind the RPLIDAR driver to the arduino hardware serial
     pinMode(47, OUTPUT);
     digitalWrite(47, HIGH);
@@ -159,9 +186,7 @@ void setup() {
     delay(2000);
 
     // Bind steppers
-    pinMode(TIR, INPUT_PULLUP);
-    pinMode(EN, OUTPUT);
-    digitalWrite(EN, HIGH);
+
 
     NEMAL.setMaxSpeed(4000.0);
     NEMAL.setAcceleration(2000.0);
@@ -169,8 +194,11 @@ void setup() {
     NEMAR.setAcceleration(2000.0);
 
     Serial.println("Waiting for button press");
-    while (digitalRead(TIR) == 1);
+    while (digitalRead(TIR) == 1){
 
+        delay(1000);
+        Serial.println("J'attend");
+    }
     NEMAL.moveTo(1000000);
     NEMAR.moveTo(-1000000);
     digitalWrite(EN, LOW);
