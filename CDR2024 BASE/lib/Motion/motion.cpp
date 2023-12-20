@@ -15,7 +15,7 @@ Motion::~Motion()
 
 void Motion::MoveLine(){
     
-    *left.moveTo(100);
+    left->moveTo(100);
     right->moveTo(-100);
 
 
