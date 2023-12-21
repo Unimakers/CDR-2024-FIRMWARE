@@ -27,9 +27,7 @@
 
 
 
-
-
-
+HardwareSerial mySerial (1);
 
 
 // You need to create an driver instance 
@@ -44,8 +42,6 @@ Motion Robot(NEMAL,NEMAR);
 
 IHM Physical;
 
-HardwareSerial mySerial (1);
-
 //create a file named STRUCT_LIDAR_MESURE to ad the point mesure by the lidar
 typedef struct {
     float distance = 0;
@@ -57,8 +53,6 @@ typedef struct {
 STRUCT_LIDAR_MESURE mesure;
 
 int status_obstacle = 0;
-
-
 
 void reset_point() {
     mesure.distance = 0;
@@ -134,7 +128,7 @@ void get_point_lidar() {
         }
     } else { //if the lidar is not connected
         analogWrite(RPLIDAR_MOTOR, 0); //stop the rplidar motor
-        //Serial.println("check connection...");
+
         rplidar_response_device_info_t info;
         if (IS_OK(lidar.getDeviceInfo(info, 100))) { //check if the lidar is connected
             // detected...
@@ -145,6 +139,7 @@ void get_point_lidar() {
         }
     }
 }
+
 void LidarTask(void *pvParameters)
 {
 	for (;;)
@@ -167,45 +162,33 @@ void print_mesure() {
 void setup() {
     //pinMode(TIR, INPUT_PULLUP); // done in physical library
 
+
     //Initialise the Enable of the stepper drivers
     pinMode(EN, OUTPUT);
     digitalWrite(EN, HIGH);
 
-
     // bind the RPLIDAR driver to the arduino hardware serial
 
-    pinMode(47, OUTPUT);
-    digitalWrite(47, HIGH);
-    delay(2000); // why?
-    digitalWrite(47, LOW);
     lidar.begin(mySerial);
     Serial.begin(115200);
     // set pin modes
     pinMode(RPLIDAR_MOTOR, OUTPUT);
     analogWrite(RPLIDAR_MOTOR, SPEED_MOTOR_LIDAR); //start the rplidar motor
+
+
     Serial.println("Begin code");
     delay(2000);
 
     // inialise steppers
 
-
-    //NEMAL.setMaxSpeed(4000.0);
-    //NEMAL.setAcceleration(2000.0);
-    //NEMAR.setMaxSpeed(4000.0);
-    //NEMAR.setAcceleration(2000.0);
-
-    
     Robot.SetMaxAcceleration(2000.0);
     Robot.SetSpeed(4000.0);
 
     Serial.println("Waiting for button press");
-    while (Physical.GetTirette()){
-        delay(1000); // a ennlever, c'est pour eviter le debug qui devient immense
-        Serial.println("J'attend");
-    }
-    //NEMAL.moveTo(1000000);
-    //NEMAR.moveTo(-1000000);
-    Robot.MoveLine(100);
+    while (Physical.GetTirette());
+
+    Robot.MoveLine(10000);
+
 
     digitalWrite(EN, LOW);
     Serial.println("Steppers start");
@@ -213,9 +196,7 @@ void setup() {
 }
 
 void loop() {
-    while (status_obstacle == 0) {
-        // NEMAL.run();
-        // NEMAR.run();  
+    if(status_obstacle == 0) {
         Robot.Run();
     }
 }
