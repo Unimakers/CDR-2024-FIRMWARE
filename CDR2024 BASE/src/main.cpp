@@ -54,10 +54,12 @@ typedef struct {
 
 STRUCT_LIDAR_MESURE mesure;
 
-const char* ssid = "Vanderputten tp link";
-const char* password = "Putten01";
+const char* ssid = "............";
+const char* password = ".......";
 
 bool status_obstacle = false;
+bool status_obstacle = false;
+
 
 //remove if you need to remove ota
 
@@ -69,7 +71,6 @@ void OTA_init(){
     delay(5000);
     ESP.restart();
   }
-
   // Port defaults to 3232
   // ArduinoOTA.setPort(3232);
 
@@ -115,7 +116,6 @@ void OTA_init(){
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
   Serial.println("Wow this has changed");
-
 }
 
 void reset_point() {
@@ -259,7 +259,10 @@ void loop() {
 
     }else{
         if(!status_obstacle) {
-            Robot.Run();
+            if(!status_obstacle){ // faire double variable
+              Robot.Run();
+            }
+            
         }else{
             Robot.Stop();
             while (status_obstacle) // attention, un while loop est bloquant, donc on peux faire autrement c'est mieux, peux etre des varibales d'état
