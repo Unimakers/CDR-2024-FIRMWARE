@@ -34,7 +34,6 @@ AccelStepper NEMAR(AccelStepper::DRIVER, STEP2, DIR2);
 //intialise the wrapper
 Motion Robot(NEMAL,NEMAR, EN);
 
-
 //Initialise Human machine interface
 IHM Physical;
 
@@ -174,7 +173,7 @@ void setup() {
 
     Serial.println("Waiting for button press");
     while (Physical.GetTirette());
-    Robot.MoveLine(20000);
+    Robot.MoveLine(15000);
 
     Robot.Enable();
     Serial.println("Steppers start");
@@ -189,8 +188,11 @@ void loop() {
             Robot.Run();
         }else{
             Robot.Stop();
-            Robot.Run();
+            while (status_obstacle) // attention, un while loop est bloquant, donc on peux faire autrement c'est mieux, peux etre des varibales d'état
+            {
+                Robot.Run();
+            }
+            Robot.Resume(); // resume la tache en cours
         }
-
     }
 }

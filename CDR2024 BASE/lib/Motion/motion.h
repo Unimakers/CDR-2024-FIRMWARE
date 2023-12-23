@@ -46,6 +46,7 @@ class Motion
         void Turn(int angle);
 
         void Stop();
+        void Resume();
 
         void Enable();
         void Disable();

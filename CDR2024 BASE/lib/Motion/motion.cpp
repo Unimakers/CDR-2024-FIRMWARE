@@ -81,9 +81,8 @@ void Motion::MoveArc(int side , int angle, int radius){
             Serial.println("error, no declared type of arc movement");
     }
 }
-
+/// @brief Stops the robot in a slow manner
 void Motion::Stop(){
-
     if(PendingStop){
         if(TargetReached()){
             PendingStop = false;
@@ -93,13 +92,24 @@ void Motion::Stop(){
         }
     }else{
         PendingStop = true; 
+        LeftOverDistance.LeftDistance=left.distanceToGo(); //Store the Distance left to go
+        LeftOverDistance.RightDistance=right.distanceToGo(); // Store the Distance left to go
+        Serial.println(LeftOverDistance.LeftDistance);
+        Serial.println(LeftOverDistance.RightDistance);
         left.stop();
         right.stop();
+        // as the stop command has set a new distanceToGo, we need to remove this distance from the pending task
+        LeftOverDistance.LeftDistance-=left.distanceToGo(); //remove the distance done by the stop command
+        LeftOverDistance.RightDistance-=right.distanceToGo(); // remove the distance done by the stop command
         Serial.println("Stop incoming");
     }
-    
+}
+/// @brief Should be called after a stop command if the robot need to finsih last task
+void Motion::Resume(){
 
-  
+    left.move(LeftOverDistance.LeftDistance);
+    right.move(LeftOverDistance.RightDistance);
+
 }
 
 
