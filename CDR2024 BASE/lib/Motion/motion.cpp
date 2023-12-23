@@ -3,11 +3,21 @@
 
 Motion::Motion(AccelStepper &L, AccelStepper &R):left(L), right(R)
 {
+    LeftOverDistance.LeftDistance = 0;
+    LeftOverDistance.RightDistance = 0;
+}
 
+Motion::Motion(AccelStepper &L, AccelStepper &R,int enablePin):left(L), right(R),Enpin(enablePin)
+{
+    pinMode(Enpin,OUTPUT);
+    digitalWrite(Enpin, HIGH);
+    LeftOverDistance.LeftDistance = 0;
+    LeftOverDistance.RightDistance = 0;
 }
 
 Motion::~Motion()
 {
+
 }
 
 
@@ -21,7 +31,6 @@ void Motion::SetMaxAcceleration(float a){
     right.setAcceleration(a);
 }
 
-
 /// @brief Makes the robot move in a straight line
 /// @param distance the distance in steps to do, will be in mm in future version as seen in next functions
 void Motion::MoveLine(int distance){
@@ -29,7 +38,8 @@ void Motion::MoveLine(int distance){
     left.move(distance);
     right.move(-distance);
 }
-
+/// @brief Makes the robot turn auround on its center point
+/// @param angle The relative angle of rotation
 void Motion::Turn(int angle){
     // la formule de longeur d'un arc de cercle (la distance a parcourir pour une roue)
     // est 2*Pi*A**R/360, il faudrait voir si il n'existe pas de formules sans divisions
@@ -58,8 +68,6 @@ void Motion::MoveArc(int side , int angle, int radius){
     int StepsToDoBigArc = MMtoDoBigArc*STEPPERMM;
     int StepsToDoSmallArc = MMtoDoSmallArc*STEPPERMM;
 
-
-
     switch(side){
         case Left_Arc:
             left.move(StepsToDoBigArc);
@@ -74,8 +82,64 @@ void Motion::MoveArc(int side , int angle, int radius){
     }
 }
 
+void Motion::Stop(){
 
-/// @brief Run the robot
+    if(PendingStop){
+        if(TargetReached()){
+            PendingStop = false;
+            return;
+        }else{
+            return;
+        }
+    }else{
+        PendingStop = true; 
+        left.stop();
+        right.stop();
+        Serial.println("Stop incoming");
+    }
+    
+
+  
+}
+
+
+RobotDistance Motion::DistanceToGo(){
+
+    RobotDistance tmp;
+    tmp.LeftDistance = left.distanceToGo();
+    tmp.RightDistance = right.distanceToGo();
+
+    return tmp;
+}
+/// @brief Checks if both motors have reached their targets
+/// @return True if valid, false otherwise
+bool Motion::TargetReached(){
+
+    RobotDistance tmp;
+
+    tmp = DistanceToGo();
+
+    if(tmp.LeftDistance == 0 && tmp.RightDistance == 0){
+        return true;
+    }else{
+        return false;
+    }
+
+}
+/// @brief Very easy way to Enable the motors
+void Motion::Enable()
+{
+    digitalWrite(Enpin,LOW);
+
+}
+/// @brief Very easy way to disable the motors
+void Motion::Disable(){
+
+    digitalWrite(Enpin,HIGH);
+
+}
+
+/// @brief Run the robot,
 /// Updates the two motors to run at the same time
 void Motion::Run(){
     left.run();

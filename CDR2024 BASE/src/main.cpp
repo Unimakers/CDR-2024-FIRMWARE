@@ -10,9 +10,6 @@
 #include <ihm.h>
 
 
-
-
-
 // d8888b. db    db db       .d8b.  d8b   db      d8888b. d88888b      d8888b. d8888b. d88888b d888888b  .d8b.   d888b  d8b   db d88888b 
 // 88  `8D `8b  d8' 88      d8' `8b 888o  88      88  `8D 88'          88  `8D 88  `8D 88'     `~~88~~' d8' `8b 88' Y8b 888o  88 88'     
 // 88   88  `8bd8'  88      88ooo88 88V8o 88      88   88 88ooooo      88oooY' 88oobY' 88ooooo    88    88ooo88 88      88V8o 88 88ooooo 
@@ -20,9 +17,6 @@
 // 88  .8D    88    88booo. 88   88 88  V888      88  .8D 88.          88   8D 88 `88. 88.        88    88   88 88. ~8~ 88  V888 88.     
 // Y8888D'    YP    Y88888P YP   YP VP   V8P      Y8888D' Y88888P      Y8888P' 88   YD Y88888P    YP    YP   YP  Y888P  VP   V8P Y88888P 
                                                                                                                                       
-                                                                                                                                      
-
-
 
 
 
@@ -38,8 +32,10 @@ AccelStepper NEMAL(AccelStepper::DRIVER, STEP1, DIR1);
 AccelStepper NEMAR(AccelStepper::DRIVER, STEP2, DIR2);
 
 //intialise the wrapper
-Motion Robot(NEMAL,NEMAR);
+Motion Robot(NEMAL,NEMAR, EN);
 
+
+//Initialise Human machine interface
 IHM Physical;
 
 //create a file named STRUCT_LIDAR_MESURE to ad the point mesure by the lidar
@@ -52,7 +48,8 @@ typedef struct {
 
 STRUCT_LIDAR_MESURE mesure;
 
-int status_obstacle = 0;
+bool status_obstacle = false;
+
 
 void reset_point() {
     mesure.distance = 0;
@@ -65,16 +62,16 @@ void reset_point() {
 void led(int statue) {
     if (statue == 1) {
         digitalWrite(47, HIGH);
-        status_obstacle = 1;
+        status_obstacle = true;
     } else {
         digitalWrite(47, LOW);
-        status_obstacle = 0;
+        status_obstacle = false;
     }
 }
 
 
 int ANGLE_IN_RANGE() {
-    if ((mesure.angle >= 160 && mesure.angle <= 200) || (mesure.angle >= 340 || mesure.angle <= 20)) {
+    if ((mesure.angle >= 250 && mesure.angle <= 290) || (mesure.angle >= 70 || mesure.angle <= 110)) {
         return true;
     }
     return false;
@@ -148,6 +145,7 @@ void LidarTask(void *pvParameters)
         
     }
 }
+
 void print_mesure() {
     Serial.print(">lidar:");
     Serial.print(mesure.distance * cos(mesure.angle * DEG_TO_RAD));
@@ -157,46 +155,42 @@ void print_mesure() {
     Serial.println("|xy");
 }
 
-
-
 void setup() {
-    //pinMode(TIR, INPUT_PULLUP); // done in physical library
-
-
-    //Initialise the Enable of the stepper drivers
-    pinMode(EN, OUTPUT);
-    digitalWrite(EN, HIGH);
-
     // bind the RPLIDAR driver to the arduino hardware serial
 
+    delay(5000);
     lidar.begin(mySerial);
     Serial.begin(115200);
-    // set pin modes
+
     pinMode(RPLIDAR_MOTOR, OUTPUT);
     analogWrite(RPLIDAR_MOTOR, SPEED_MOTOR_LIDAR); //start the rplidar motor
-
 
     Serial.println("Begin code");
     delay(2000);
 
     // inialise steppers
-
     Robot.SetMaxAcceleration(2000.0);
     Robot.SetSpeed(4000.0);
 
     Serial.println("Waiting for button press");
     while (Physical.GetTirette());
+    Robot.MoveLine(20000);
 
-    Robot.MoveLine(10000);
-
-
-    digitalWrite(EN, LOW);
+    Robot.Enable();
     Serial.println("Steppers start");
     xTaskCreatePinnedToCore(LidarTask, "lidarTask", 10000, NULL, 0, NULL, 0);
 }
 
 void loop() {
-    if(status_obstacle == 0) {
-        Robot.Run();
+    if(Robot.TargetReached()){
+        Robot.Disable();
+    }else{
+        if(!status_obstacle) {
+            Robot.Run();
+        }else{
+            Robot.Stop();
+            Robot.Run();
+        }
+
     }
 }

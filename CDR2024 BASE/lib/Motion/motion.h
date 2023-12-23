@@ -14,24 +14,42 @@ typedef enum
     Right_Arc=1
 } Arc;
 
+typedef struct{
+    long LeftDistance;
+    long RightDistance;
+}RobotDistance;
+
 
 class Motion
 {
-protected:
-    AccelStepper &left, &right;
+    protected:
 
-public:
-    Motion(AccelStepper &L, AccelStepper &R);
-    ~Motion();
-    
-    
-    void SetSpeed(float Speed);
-    void SetMaxAcceleration(float a);
+        RobotDistance LeftOverDistance;
 
-    void MoveLine(int distance);
-    void MoveArc(int side , int angle, int radius);
-    void Turn(int angle);
-    void Run();
+        AccelStepper &left, &right;
+        RobotDistance DistanceToGo();
+        const int Enpin = 0;
+        bool PendingStop = false;
+
+    public:
+        Motion(AccelStepper &L, AccelStepper &R);
+        Motion(AccelStepper &L, AccelStepper &R,int enablePin);
+        ~Motion();
+        
+        void SetSpeed(float Speed);
+        void SetMaxAcceleration(float a);
+
+        bool TargetReached();
+
+        void MoveLine(int distance);
+        void MoveArc(int side , int angle, int radius);
+        void Turn(int angle);
+
+        void Stop();
+
+        void Enable();
+        void Disable();
+        void Run();
 
 
 };

@@ -18,6 +18,11 @@
       {
         "name": "Dan Crank",
         "email": "danno@danno.org"
+      },
+      {
+        "name": "Unimakers",
+        "email": "Unimakers.amiens@gmail.com",
+        "url": "https://www.Unimakers.fr"
       }
     ],
     "license": "MIT",
