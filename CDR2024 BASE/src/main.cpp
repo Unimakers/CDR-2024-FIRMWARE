@@ -9,7 +9,6 @@
 #include <motion.h>
 #include <ihm.h>
 
-
 // remove if you want to remove OTA
 #include <WiFi.h>
 #include <ESPmDNS.h>
@@ -25,11 +24,7 @@
 // Y8888D'    YP    Y88888P YP   YP VP   V8P      Y8888D' Y88888P      Y8888P' 88   YD Y88888P    YP    YP   YP  Y888P  VP   V8P Y88888P 
                                                                                                                                       
 
-
-
-
 HardwareSerial mySerial (1);
-
 
 // You need to create an driver instance 
 RPLidar lidar;
@@ -54,11 +49,12 @@ typedef struct {
 
 STRUCT_LIDAR_MESURE mesure;
 
-const char* ssid = "............";
-const char* password = ".......";
+const char* ssid = "Vanderputten tp link";
+const char* password = "Putten01";
 
 bool status_obstacle = false;
-bool status_obstacle = false;
+bool old_status_obstacle = false;
+bool Armed = true;
 
 
 //remove if you need to remove ota
@@ -137,7 +133,7 @@ void led(int statue) {
 }
 
 
-int ANGLE_IN_RANGE() {
+bool ANGLE_IN_RANGE() {
     if ((mesure.angle >= 250 && mesure.angle <= 290) || (mesure.angle >= 70 || mesure.angle <= 110)) {
         return true;
     }
@@ -145,7 +141,7 @@ int ANGLE_IN_RANGE() {
 }
 
 void obstacle() {
-    if (mesure.distance < DIST_OBSTACLE && mesure.distance > 50) {
+    if (mesure.distance < DIST_OBSTACLE && mesure.distance > 10) {
       if(check_chrono()==0){
         start_chrono();
       }else if(check_chrono()<TIME_TO_CHANGE) {
@@ -224,12 +220,9 @@ void print_mesure() {
 
 void setup() {
     // bind the RPLIDAR driver to the arduino hardware serial
-
-
     OTA_init(); // remove if you need to remove ota
+    delay(2000);
 
-
-    delay(5000);
     lidar.begin(mySerial);
     Serial.begin(115200);
 
@@ -240,36 +233,65 @@ void setup() {
     delay(2000);
 
     // inialise steppers
-    Robot.SetMaxAcceleration(2000.0);
+    Robot.SetMaxAcceleration(3000.0);
     Robot.SetSpeed(4000.0);
 
-    Serial.println("Waiting for button press");
-    while (Physical.GetTirette());
-    Robot.MoveLine(-15000);
+    Serial.println("Waiting for insert tirrette");
+    while (!Physical.GetTirette()){
+      ArduinoOTA.handle();
+    }
+    Serial.println("Waiting for remove tirrette");
+    delay(1000);//wait for stable connection
+    while (Physical.GetTirette()){
+      ArduinoOTA.handle();
+    }
+    Robot.MoveLine(15000);
 
     Robot.Enable();
     Serial.println("Steppers start");
     xTaskCreatePinnedToCore(LidarTask, "lidarTask", 10000, NULL, 0, NULL, 0);
 }
 
-void loop() {
-    if(Robot.TargetReached()){ // to be replaced by strategy finished
-        Robot.Disable();
-        ArduinoOTA.handle(); //remove if you need to remove ota
+void HumanPeriphirals(){
+  // if( Physical.GetButton(1) ){
+  //   Robot.Disable();
+  //   ArduinoOTA.handle();
+  //   Armed = false;
+  // }
 
-    }else{
-        if(!status_obstacle) {
-            if(!status_obstacle){ // faire double variable
-              Robot.Run();
-            }
-            
-        }else{
-            Robot.Stop();
-            while (status_obstacle) // attention, un while loop est bloquant, donc on peux faire autrement c'est mieux, peux etre des varibales d'état
-            {
-                Robot.Run();
-            }
-            Robot.Resume(); // resume la tache en cours
-        }
+
+}
+
+void RobotPeriphirals(){
+  // maybe use a temp status, to prevent any problems because of the double core
+  bool tmp_status = status_obstacle;
+  //compare si il y a eu un changement d'etat, si oui, alors agir en fonction de l'état
+  if(tmp_status != old_status_obstacle){
+    if(tmp_status){
+      Robot.Stop();
+      //Serial.println("Obst, stopping");
+    }else
+    {
+      Robot.Resume();
+      //Serial.println("NO-Obst, resuming");
     }
+    old_status_obstacle = tmp_status; //if the 2nd core changes status obstacle right before this command, it becomes bugged, thats why we use tmp_status
+  }
+  Robot.Run();
+}
+
+void DisplayPeriphirals(){
+
+
+
+}
+
+
+//try to make the program modular please
+void loop() {
+  HumanPeriphirals();  // comment or modular before match
+  if(Armed){ //will only run if the robot is not manually disabled
+    RobotPeriphirals();
+  }
+
 }

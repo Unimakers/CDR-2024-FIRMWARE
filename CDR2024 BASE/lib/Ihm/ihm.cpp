@@ -9,9 +9,11 @@ IHM::IHM(){
 IHM::~IHM(){
 
 }
-
+/// @brief Get the state of the trigger
+/// @return True if present, false if absent
 bool IHM::GetTirette(){
-    return digitalRead(TIR);
+    bool State = digitalRead(TIR);
+    return !State;
 }
 /// @brief Gets the state of the lonely button
 /// @param btn By default this value is one, so if left empty, defaults to main button

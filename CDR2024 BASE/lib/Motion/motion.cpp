@@ -83,32 +83,36 @@ void Motion::MoveArc(int side , int angle, int radius){
 }
 /// @brief Stops the robot in a slow manner
 void Motion::Stop(){
-    if(PendingStop){
-        if(TargetReached()){
-            PendingStop = false;
-            return;
-        }else{
-            return;
-        }
+    if(TargetReached()){ // means that the robot is already not moving so do not calculate
+        PendingStop = false;
+        LeftOverDistance.LeftDistance=0;
+        LeftOverDistance.RightDistance=0;
+        return;
+    }
+    if(PendingStop){ // means we have already calculated the stop sequence
+        return;
     }else{
         PendingStop = true; 
         LeftOverDistance.LeftDistance=left.distanceToGo(); //Store the Distance left to go
         LeftOverDistance.RightDistance=right.distanceToGo(); // Store the Distance left to go
-        Serial.println(LeftOverDistance.LeftDistance);
-        Serial.println(LeftOverDistance.RightDistance);
+        //Serial.println(LeftOverDistance.LeftDistance);
+        //Serial.println(LeftOverDistance.RightDistance);
         left.stop();
         right.stop();
         // as the stop command has set a new distanceToGo, we need to remove this distance from the pending task
         LeftOverDistance.LeftDistance-=left.distanceToGo(); //remove the distance done by the stop command
         LeftOverDistance.RightDistance-=right.distanceToGo(); // remove the distance done by the stop command
-        Serial.println("Stop incoming");
+        //Serial.println("Stop incoming");
     }
 }
-/// @brief Should be called after a stop command if the robot need to finsih last task
+/// @brief Should be called after a stop command if the robot needs to finsih last task
 void Motion::Resume(){
 
-    left.move(LeftOverDistance.LeftDistance);
-    right.move(LeftOverDistance.RightDistance);
+
+    PendingStop = false;
+    //If the resume command has been called when the robot was still decelrating, add the remaing distance of the stop command
+    left.move(LeftOverDistance.LeftDistance+left.distanceToGo());
+    right.move(LeftOverDistance.RightDistance+right.distanceToGo());
 
 }
 
@@ -142,10 +146,13 @@ void Motion::Enable()
     digitalWrite(Enpin,LOW);
 
 }
-/// @brief Very easy way to disable the motors
+/// @brief Very easy way to disable the motors,
+/// this will also set the movement to 0
 void Motion::Disable(){
 
     digitalWrite(Enpin,HIGH);
+    left.move(0);
+    right.move(0);
 
 }
 
