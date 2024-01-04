@@ -6,7 +6,7 @@
 // #endif
 
 #define RAYON 80
-#define STEPPERMM 120
+#define STEPPERMM 1
 
 typedef enum
 {

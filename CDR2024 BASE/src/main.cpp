@@ -225,9 +225,20 @@ void print_mesure() {
 }
 
 void BlueStrategy(){
-
-
-
+  static int state = 0;
+  switch(state){
+    case 0:
+      Robot.MoveLine(1500);
+      state++;
+      break;
+    case 1:
+      Robot.MoveLine(-1500);
+      state--;
+      break;
+    default:
+      state = 0;
+      break;
+  }
 }
 
 void YellowStrategy(){
@@ -238,19 +249,20 @@ void YellowStrategy(){
 
 void StrategyEvent(){
 
-  switch (Strat)
-  {
-  case BLUE:
-        BlueStrategy();
-    break;
-  case YELLOW:
-        YellowStrategy();
-    break;
-  
-  default:
-    break;
+  if(Robot.TargetReached()){
+    switch (Strat)
+    {
+    case BLUE:
+          BlueStrategy();
+      break;
+    case YELLOW:
+          YellowStrategy();
+      break;
+    
+    default:
+      break;
+    }
   }
-
 
 }
 
@@ -276,12 +288,12 @@ void setup() {
     while (!Physical.GetTirette()){
       ArduinoOTA.handle();
     }
+    
     Serial.println("Waiting for remove tirrette");
     delay(1000);//wait for stable connection
     while (Physical.GetTirette()){
       ArduinoOTA.handle();
     }
-    Robot.MoveLine(15000);
 
     Robot.Enable();
     Serial.println("Steppers start");
@@ -315,12 +327,13 @@ void ObstacleHandle(){
   }
 }
 
+
+
 void RobotPeriphirals(){  
   ObstacleHandle();
-  if(!Robot.GetPendingStop()){
-    
+  if(!Robot.GetPendingStop()){//test if there is a obstacle stop in work, if so, then do check the strategy mouvement
+    StrategyEvent();
   }
-
   Robot.Run();
 }
 
@@ -329,7 +342,6 @@ void DisplayPeriphirals(){
 
 
 }
-
 
 //try to make the program modular please
 void loop() {

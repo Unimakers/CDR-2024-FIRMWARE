@@ -50,7 +50,6 @@ void Motion::Turn(int angle){
     right.move(StepsToDo);
 }
 
-
 // verifier si les signes sont dans le bon sens lors du mise en route officielle
 
 /// @brief Makes an arc movement
