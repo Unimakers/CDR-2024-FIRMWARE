@@ -81,6 +81,13 @@ void Motion::MoveArc(int side , int angle, int radius){
             Serial.println("error, no declared type of arc movement");
     }
 }
+
+
+bool Motion::GetPendingStop(){
+    return PendingStop;
+}
+
+
 /// @brief Stops the robot in a slow manner
 void Motion::Stop(){
     if(TargetReached()){ // means that the robot is already not moving so do not calculate

@@ -49,12 +49,21 @@ typedef struct {
 
 STRUCT_LIDAR_MESURE mesure;
 
+typedef enum
+{
+    BLUE,
+    YELLOW
+} Strategy;
+
+Strategy Strat = BLUE;
+
 const char* ssid = "Vanderputten tp link";
 const char* password = "Putten01";
 
 bool status_obstacle = false;
 bool old_status_obstacle = false;
 bool Armed = true;
+
 
 
 //remove if you need to remove ota
@@ -132,7 +141,6 @@ void led(int statue) {
     }
 }
 
-
 bool ANGLE_IN_RANGE() {
     if ((mesure.angle >= 250 && mesure.angle <= 290) || (mesure.angle >= 70 || mesure.angle <= 110)) {
         return true;
@@ -171,8 +179,6 @@ void obstacle() {
 //     led(0);
 //     return false;
 // }
-
-
 
 void get_point_lidar() {
     if (IS_OK(lidar.waitPoint())) { //check if the lidar is connected
@@ -216,6 +222,36 @@ void print_mesure() {
     Serial.print(mesure.distance * sin(mesure.angle * DEG_TO_RAD));
     Serial.print(":");
     Serial.println("|xy");
+}
+
+void BlueStrategy(){
+
+
+
+}
+
+void YellowStrategy(){
+
+
+
+}
+
+void StrategyEvent(){
+
+  switch (Strat)
+  {
+  case BLUE:
+        BlueStrategy();
+    break;
+  case YELLOW:
+        YellowStrategy();
+    break;
+  
+  default:
+    break;
+  }
+
+
 }
 
 void setup() {
@@ -262,7 +298,7 @@ void HumanPeriphirals(){
 
 }
 
-void RobotPeriphirals(){
+void ObstacleHandle(){
   // maybe use a temp status, to prevent any problems because of the double core
   bool tmp_status = status_obstacle;
   //compare si il y a eu un changement d'etat, si oui, alors agir en fonction de l'état
@@ -277,6 +313,14 @@ void RobotPeriphirals(){
     }
     old_status_obstacle = tmp_status; //if the 2nd core changes status obstacle right before this command, it becomes bugged, thats why we use tmp_status
   }
+}
+
+void RobotPeriphirals(){  
+  ObstacleHandle();
+  if(!Robot.GetPendingStop()){
+    
+  }
+
   Robot.Run();
 }
 
