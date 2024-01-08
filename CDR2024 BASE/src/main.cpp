@@ -205,7 +205,7 @@ void get_point_lidar() {
         }
     }
 }
-
+//pour commit
 void LidarTask(void *pvParameters)
 {
 	for (;;)
