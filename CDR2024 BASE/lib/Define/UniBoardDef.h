@@ -26,3 +26,6 @@
 #define MAX_DISTANCE_LIDAR 3500 // max distance of the lidar in mm
 #define DIST_OBSTACLE 350 // distance of the obstacle in mm
 #define TIME_TO_CHANGE 0.1
+
+// Related to servos
+#define SERVO_FREQ_HZ 50

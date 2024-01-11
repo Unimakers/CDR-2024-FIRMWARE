@@ -8,12 +8,17 @@
 #include <chrono.h>
 #include <motion.h>
 #include <ihm.h>
+//#include <ChadServo.h>
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
+#include <SPI.h>
 
 // remove if you want to remove OTA
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
+
 
 
 // d8888b. db    db db       .d8b.  d8b   db      d8888b. d88888b      d8888b. d8888b. d88888b d888888b  .d8b.   d888b  d8b   db d88888b 
@@ -65,10 +70,12 @@ bool old_status_obstacle = false;
 bool Armed = true;
 
 
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40,Wire);
 
 //remove if you need to remove ota
 
 void OTA_init(){
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -266,13 +273,89 @@ void StrategyEvent(){
 
 }
 
+void set_servo_pulse(unsigned char n, double pulse) {
+    double pulselength = 1000000;
+    pulselength /= SERVO_FREQ_HZ * 4096;
+    pulse *= 1000000;
+    pulse /= pulselength;
+    pwm.setPWM(n, 0, pulse);
+}
+
+// Scan en ping les adresses possibles afin de trouver des périphs en I2C
+void scan_i2c() {
+    unsigned char error, address;
+    int nDevices = 0;
+
+    Serial.println("Scan...");
+
+    for (address = 1; address < 127; address++) {
+        Wire.beginTransmission(address);
+        error = Wire.endTransmission();
+
+        if (error == 0) {
+            Serial.print("I2C found, address: 0x");
+            if (address < 16) {
+                Serial.print("0");
+            }
+            Serial.println(address, HEX);
+            nDevices += 1;
+        } else if (error == 4) {
+            Serial.print("Unknown error at address: 0x");
+            if (address < 16) {
+                Serial.print("0");
+            }
+            Serial.println(address, HEX);
+        }
+    }
+
+    if (nDevices == 0) {
+        Serial.println("No I2C found");
+    } else {
+        Serial.print("nDevices: ");
+        Serial.println(nDevices);
+    }
+}
+
 void setup() {
     // bind the RPLIDAR driver to the arduino hardware serial
-    OTA_init(); // remove if you need to remove ota
+    //OTA_init(); // remove if you need to remove ota
     delay(2000);
 
     lidar.begin(mySerial);
     Serial.begin(115200);
+
+    Wire.begin(5, 4);
+    scan_i2c();
+    // Servos
+    pwm.begin();
+    pwm.setOscillatorFrequency(25000000); // https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library/blob/master/examples/servo/servo.ino#L49
+    pwm.setPWMFreq(SERVO_FREQ_HZ);
+    /*
+        MOTEUR PIN 1 : réglage hauteur,      bas ~150 haut ~450
+        MOTEUR PIN 2 : réglage pince droite, droite ~450 gauche ~150
+        MOTEUR PIN 3 : réglage pince gauche, droite ~450 gauche ~150
+        MOTEUR PIN 4 : réglage angle,        droite ~150 gauche ~450
+    */
+    
+    //while (1) {
+    //    for (int test1 = 150; test1 <= 450; test1++) {
+    //        pwm.setPWM(1, 0, test1);
+    //        delay(4);
+    //    }
+
+    //    for (int test1 = 450; test1 >= 150; test1--) {
+    //        pwm.setPWM(1, 0, test1);
+    //        delay(4);
+    //    }
+    //}
+
+    /*
+        TO-DO: presets fonctions pour les mouvements requis du robot,
+               voir fonction map pour convertir valeur max valeur min des servos en angle pour mieux manipuler ?
+    */
+
+    //pwm.setPWM(1, 0, 490);
+    //set_servo_pulse(0, 300);
 
     pinMode(RPLIDAR_MOTOR, OUTPUT);
     analogWrite(RPLIDAR_MOTOR, SPEED_MOTOR_LIDAR); //start the rplidar motor
