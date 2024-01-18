@@ -8,7 +8,7 @@
 #include <chrono.h>
 #include <motion.h>
 #include <ihm.h>
-//#include <ChadServo.h>
+#include <ChadServo.h>
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <SPI.h>
@@ -20,14 +20,20 @@
 #include <ArduinoOTA.h>
 
 
-
 // d8888b. db    db db       .d8b.  d8b   db      d8888b. d88888b      d8888b. d8888b. d88888b d888888b  .d8b.   d888b  d8b   db d88888b 
 // 88  `8D `8b  d8' 88      d8' `8b 888o  88      88  `8D 88'          88  `8D 88  `8D 88'     `~~88~~' d8' `8b 88' Y8b 888o  88 88'     
 // 88   88  `8bd8'  88      88ooo88 88V8o 88      88   88 88ooooo      88oooY' 88oobY' 88ooooo    88    88ooo88 88      88V8o 88 88ooooo 
 // 88   88    88    88      88~~~88 88 V8o88      88   88 88~~~~~      88~~~b. 88`8b   88~~~~~    88    88~~~88 88  ooo 88 V8o88 88~~~~~ 
 // 88  .8D    88    88booo. 88   88 88  V888      88  .8D 88.          88   8D 88 `88. 88.        88    88   88 88. ~8~ 88  V888 88.     
 // Y8888D'    YP    Y88888P YP   YP VP   V8P      Y8888D' Y88888P      Y8888P' 88   YD Y88888P    YP    YP   YP  Y888P  VP   V8P Y88888P 
-                                                                                                                                      
+
+
+// ██    ██ ██ ███████ ██ ████████ ███████ ██████      ██████  ██    ██     ██      ███████     ██████   █████  ████████ 
+// ██    ██ ██ ██      ██    ██    ██      ██   ██     ██   ██  ██  ██      ██      ██          ██   ██ ██   ██    ██    
+// ██    ██ ██ ███████ ██    ██    █████   ██   ██     ██████    ████       ██      █████       ██████  ███████    ██    
+//  ██  ██  ██      ██ ██    ██    ██      ██   ██     ██   ██    ██        ██      ██          ██   ██ ██   ██    ██    
+//   ████   ██ ███████ ██    ██    ███████ ██████      ██████     ██        ███████ ███████     ██   ██ ██   ██    ██    
+
 
 HardwareSerial mySerial (1);
 
@@ -70,7 +76,7 @@ bool old_status_obstacle = false;
 bool Armed = true;
 
 
-Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40,Wire);
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 
 //remove if you need to remove ota
 
@@ -273,6 +279,7 @@ void StrategyEvent(){
 
 }
 
+/*
 void set_servo_pulse(unsigned char n, double pulse) {
     double pulselength = 1000000;
     pulselength /= SERVO_FREQ_HZ * 4096;
@@ -280,41 +287,7 @@ void set_servo_pulse(unsigned char n, double pulse) {
     pulse /= pulselength;
     pwm.setPWM(n, 0, pulse);
 }
-
-// Scan en ping les adresses possibles afin de trouver des périphs en I2C
-void scan_i2c() {
-    unsigned char error, address;
-    int nDevices = 0;
-
-    Serial.println("Scan...");
-
-    for (address = 1; address < 127; address++) {
-        Wire.beginTransmission(address);
-        error = Wire.endTransmission();
-
-        if (error == 0) {
-            Serial.print("I2C found, address: 0x");
-            if (address < 16) {
-                Serial.print("0");
-            }
-            Serial.println(address, HEX);
-            nDevices += 1;
-        } else if (error == 4) {
-            Serial.print("Unknown error at address: 0x");
-            if (address < 16) {
-                Serial.print("0");
-            }
-            Serial.println(address, HEX);
-        }
-    }
-
-    if (nDevices == 0) {
-        Serial.println("No I2C found");
-    } else {
-        Serial.print("nDevices: ");
-        Serial.println(nDevices);
-    }
-}
+*/
 
 void setup() {
     // bind the RPLIDAR driver to the arduino hardware serial
