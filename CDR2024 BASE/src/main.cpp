@@ -75,11 +75,11 @@ bool status_obstacle = false;
 bool old_status_obstacle = false;
 bool Armed = true;
 
+//Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 
-Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
+unsigned long previous_millis_servo = 0;
 
 //remove if you need to remove ota
-
 void OTA_init(){
 
   WiFi.mode(WIFI_STA);
@@ -351,9 +351,34 @@ void setup() {
       ArduinoOTA.handle();
     }
 
-    Robot.Enable();
+    //Robot.Enable();
+    Robot.Disable();
     Serial.println("Steppers start");
     xTaskCreatePinnedToCore(LidarTask, "lidarTask", 10000, NULL, 0, NULL, 0);
+}
+
+void testing_servos() {
+    //unsigned long current_millis_servo = millis();
+    /*servo_xy(SERVO_MOVE_PINCE, 72);
+    servo_z(SERVO_HAUTEUR, 0);
+    delay(1000);
+    servo_xy(SERVO_PINCE_DROITE, 2);
+    servo_xy(SERVO_PINCE_GAUCHE, 98);
+    delay(1000);
+    servo_z(SERVO_HAUTEUR, 90);
+    delay(1000);
+    servo_xy(SERVO_MOVE_PINCE, 6);
+    delay(1000);
+    servo_xy(SERVO_PINCE_DROITE, 50);
+    servo_xy(SERVO_PINCE_GAUCHE, 50);
+    delay(1000);
+    servo_z(SERVO_HAUTEUR, 100);
+    delay(1000);
+    servo_xy(SERVO_MOVE_PINCE, 72);
+    delay(1000);
+    servo_z(SERVO_HAUTEUR, 0);
+    delay(1000);*/
+    mettre_fleur_pot();
 }
 
 void HumanPeriphirals(){
@@ -362,8 +387,6 @@ void HumanPeriphirals(){
   //   ArduinoOTA.handle();
   //   Armed = false;
   // }
-
-
 }
 
 void ObstacleHandle(){
@@ -401,6 +424,7 @@ void DisplayPeriphirals(){
 
 //try to make the program modular please
 void loop() {
+    testing_servos();
   HumanPeriphirals();  // comment or modular before match
   if(Armed){ //will only run if the robot is not manually disabled
     RobotPeriphirals();

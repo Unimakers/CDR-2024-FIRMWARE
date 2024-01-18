@@ -29,3 +29,7 @@
 
 // Related to servos
 #define SERVO_FREQ_HZ 50
+#define SERVO_HAUTEUR 1
+#define SERVO_PINCE_DROITE 2
+#define SERVO_PINCE_GAUCHE 3
+#define SERVO_MOVE_PINCE 4
