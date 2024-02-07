@@ -44,6 +44,9 @@ RPLidar lidar;
 AccelStepper NEMAL(AccelStepper::DRIVER, STEP1, DIR1);
 AccelStepper NEMAR(AccelStepper::DRIVER, STEP2, DIR2);
 
+// Stepper baril
+//déplacé dans ChadServo.h
+
 //intialise the wrapper
 Motion Robot(NEMAL,NEMAR, EN);
 
@@ -77,7 +80,7 @@ bool Armed = true;
 
 //Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 
-unsigned long previous_millis_servo = 0;
+//unsigned long previous_millis_servo = 0;
 
 //remove if you need to remove ota
 void OTA_init(){
@@ -322,11 +325,6 @@ void setup() {
     //    }
     //}
 
-    /*
-        TO-DO: presets fonctions pour les mouvements requis du robot,
-               voir fonction map pour convertir valeur max valeur min des servos en angle pour mieux manipuler ?
-    */
-
     //pwm.setPWM(1, 0, 490);
     //set_servo_pulse(0, 300);
 
@@ -340,6 +338,9 @@ void setup() {
     Robot.SetMaxAcceleration(3000.0);
     Robot.SetSpeed(4000.0);
 
+    BARIL.setAcceleration(200.0);
+    BARIL.setMaxSpeed(100.0);
+
     Serial.println("Waiting for insert tirrette");
     while (!Physical.GetTirette()){
       ArduinoOTA.handle();
@@ -351,33 +352,14 @@ void setup() {
       ArduinoOTA.handle();
     }
 
-    //Robot.Enable();
-    Robot.Disable();
+    Robot.Enable();
+    //Robot.Disable();
     Serial.println("Steppers start");
     xTaskCreatePinnedToCore(LidarTask, "lidarTask", 10000, NULL, 0, NULL, 0);
 }
 
+// Debug
 void testing_servos() {
-    //unsigned long current_millis_servo = millis();
-    /*servo_xy(SERVO_MOVE_PINCE, 72);
-    servo_z(SERVO_HAUTEUR, 0);
-    delay(1000);
-    servo_xy(SERVO_PINCE_DROITE, 2);
-    servo_xy(SERVO_PINCE_GAUCHE, 98);
-    delay(1000);
-    servo_z(SERVO_HAUTEUR, 90);
-    delay(1000);
-    servo_xy(SERVO_MOVE_PINCE, 6);
-    delay(1000);
-    servo_xy(SERVO_PINCE_DROITE, 50);
-    servo_xy(SERVO_PINCE_GAUCHE, 50);
-    delay(1000);
-    servo_z(SERVO_HAUTEUR, 100);
-    delay(1000);
-    servo_xy(SERVO_MOVE_PINCE, 72);
-    delay(1000);
-    servo_z(SERVO_HAUTEUR, 0);
-    delay(1000);*/
     mettre_fleur_pot();
 }
 
@@ -414,6 +396,7 @@ void RobotPeriphirals(){
     StrategyEvent();
   }
   Robot.Run();
+  BARIL.run();
 }
 
 void DisplayPeriphirals(){
@@ -425,7 +408,8 @@ void DisplayPeriphirals(){
 //try to make the program modular please
 void loop() {
     testing_servos();
-  HumanPeriphirals();  // comment or modular before match
+    
+  //HumanPeriphirals();  // comment or modular before match
   if(Armed){ //will only run if the robot is not manually disabled
     RobotPeriphirals();
   }
