@@ -22,16 +22,20 @@ void scan_i2c() {
 
         if (error == 0) {
             Serial.print("I2C found, address: 0x");
+
             if (address < 16) {
                 Serial.print("0");
             }
+
             Serial.println(address, HEX);
-            nDevices += 1;
+            nDevices++;
         } else if (error == 4) {
             Serial.print("Unknown error at address: 0x");
+
             if (address < 16) {
                 Serial.print("0");
             }
+
             Serial.println(address, HEX);
         }
     }
