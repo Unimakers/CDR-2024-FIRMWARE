@@ -45,6 +45,7 @@ AccelStepper NEMAL(AccelStepper::DRIVER, STEP1, DIR1);
 AccelStepper NEMAR(AccelStepper::DRIVER, STEP2, DIR2);
 
 // Stepper baril
+
 //déplacé dans ChadServo.h
 
 //intialise the wrapper
@@ -353,6 +354,7 @@ void setup() {
     }
 
     Robot.Enable();
+    BARIL.setSpeed(50);
     //Robot.Disable();
     Serial.println("Steppers start");
     xTaskCreatePinnedToCore(LidarTask, "lidarTask", 10000, NULL, 0, NULL, 0);
@@ -396,7 +398,7 @@ void RobotPeriphirals(){
     StrategyEvent();
   }
   Robot.Run();
-  BARIL.run();
+  BARIL.runSpeed();
 }
 
 void DisplayPeriphirals(){
@@ -407,7 +409,7 @@ void DisplayPeriphirals(){
 
 //try to make the program modular please
 void loop() {
-    testing_servos();
+    //testing_servos();
     
   //HumanPeriphirals();  // comment or modular before match
   if(Armed){ //will only run if the robot is not manually disabled
