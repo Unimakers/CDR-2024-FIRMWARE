@@ -4,6 +4,7 @@
 
 IHM::IHM(){
     pinMode(TIR, INPUT_PULLUP);
+    pinMode(btn1,INPUT_PULLUP);
 }
 
 IHM::~IHM(){

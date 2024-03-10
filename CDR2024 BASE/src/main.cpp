@@ -12,6 +12,7 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <SPI.h>
+#include <SoftTimer.h>
 
 // remove if you want to remove OTA
 #include <WiFi.h>
@@ -45,7 +46,6 @@ AccelStepper NEMAL(AccelStepper::DRIVER, STEP1, DIR1);
 AccelStepper NEMAR(AccelStepper::DRIVER, STEP2, DIR2);
 
 // Stepper baril
-
 //déplacé dans ChadServo.h
 
 //intialise the wrapper
@@ -72,8 +72,8 @@ typedef enum
 
 Strategy Strat = BLUE;
 
-const char* ssid = "Vanderputten tp link";
-const char* password = "Putten01";
+const char* ssid = "MakerSpace - UniFi";
+const char* password = "unimakers";
 
 bool status_obstacle = false;
 bool old_status_obstacle = false;
@@ -245,15 +245,20 @@ void BlueStrategy(){
   static int state = 0;
   switch(state){
     case 0:
-      Robot.MoveLine(1500);
+      //Robot.MoveLine(-1500);
+      servo_z(1,0);
       state++;
       break;
     case 1:
-      Robot.MoveLine(-1500);
-      state--;
+      servo_xy(2,70);
+      servo_xy(3,30);
+      state++;
+      break;
+    case 2:
+      
+      state++;
       break;
     default:
-      state = 0;
       break;
   }
 }
@@ -265,7 +270,6 @@ void YellowStrategy(){
 }
 
 void StrategyEvent(){
-
   if(Robot.TargetReached()){
     switch (Strat)
     {
@@ -336,23 +340,22 @@ void setup() {
     delay(2000);
 
     // inialise steppers
-    Robot.SetMaxAcceleration(3000.0);
-    Robot.SetSpeed(4000.0);
+    Robot.SetMaxAcceleration(1000.0);
+    Robot.SetSpeed(1000.0);
 
     BARIL.setAcceleration(200.0);
     BARIL.setMaxSpeed(100.0);
 
     Serial.println("Waiting for insert tirrette");
-    while (!Physical.GetTirette()){
+    while (!Physical.GetButton(1)){
       ArduinoOTA.handle();
     }
     
     Serial.println("Waiting for remove tirrette");
     delay(1000);//wait for stable connection
-    while (Physical.GetTirette()){
+    while (Physical.GetButton(1)){
       ArduinoOTA.handle();
     }
-
     Robot.Enable();
     BARIL.setSpeed(50);
     //Robot.Disable();

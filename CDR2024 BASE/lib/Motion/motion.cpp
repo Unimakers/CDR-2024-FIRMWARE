@@ -34,9 +34,9 @@ void Motion::SetMaxAcceleration(float a){
 /// @brief Makes the robot move in a straight line
 /// @param distance the distance in steps to do, will be in mm in future version as seen in next functions
 void Motion::MoveLine(int distance){
-    
+    distance = distance * STEPPERMM;
     left.move(distance);
-    right.move(-distance);
+    right.move(distance);
 }
 /// @brief Makes the robot turn auround on its center point
 /// @param angle The relative angle of rotation
@@ -47,7 +47,7 @@ void Motion::Turn(int angle){
     int MMToDo = (2*3.14*angle*RAYON)/360;
     int StepsToDo = MMToDo*STEPPERMM;
     left.move(StepsToDo);
-    right.move(StepsToDo);
+    right.move(-StepsToDo);
 }
 
 // verifier si les signes sont dans le bon sens lors du mise en route officielle
@@ -61,8 +61,8 @@ void Motion::MoveArc(int side , int angle, int radius){
     int BigArc = radius+halfRayon;
     int SmallArc = radius-halfRayon;
 
-    int MMtoDoBigArc = (2*3.14*angle*BigArc)/360;
-    int MMtoDoSmallArc = (2*3.14*angle*SmallArc)/360;
+    int MMtoDoBigArc = (2*3.14*angle*BigArc)/180;
+    int MMtoDoSmallArc = (2*3.14*angle*SmallArc)/180;
     
     int StepsToDoBigArc = MMtoDoBigArc*STEPPERMM;
     int StepsToDoSmallArc = MMtoDoSmallArc*STEPPERMM;
@@ -78,6 +78,7 @@ void Motion::MoveArc(int side , int angle, int radius){
         break;
         default:
             Serial.println("error, no declared type of arc movement");
+        break;
     }
 }
 

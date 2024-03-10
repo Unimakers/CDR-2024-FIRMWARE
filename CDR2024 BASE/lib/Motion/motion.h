@@ -5,8 +5,8 @@
 // #define _MOTION_H
 // #endif
 
-#define RAYON 80
-#define STEPPERMM 1
+#define RAYON 145
+#define STEPPERMM 6.26
 
 typedef enum
 {
