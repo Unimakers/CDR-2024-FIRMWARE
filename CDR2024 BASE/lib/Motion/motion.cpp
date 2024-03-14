@@ -1,25 +1,16 @@
 #include "motion.h"
+//Board Carateritics
+#include "UniBoardDef.h"
 
+Motion Motion::m_instance;
 
-Motion::Motion(AccelStepper &L, AccelStepper &R):left(L), right(R)
+Motion::Motion() : left(AccelStepper::DRIVER, PIN::Steppers::STEP1, PIN::Steppers::DIR1), right(AccelStepper::DRIVER, PIN::Steppers::STEP2, PIN::Steppers::DIR2)
 {
+    pinMode(PIN::Steppers::EN,OUTPUT);
+    digitalWrite(PIN::Steppers::EN, HIGH);
     LeftOverDistance.LeftDistance = 0;
     LeftOverDistance.RightDistance = 0;
 }
-
-Motion::Motion(AccelStepper &L, AccelStepper &R,int enablePin):left(L), right(R),Enpin(enablePin)
-{
-    pinMode(Enpin,OUTPUT);
-    digitalWrite(Enpin, HIGH);
-    LeftOverDistance.LeftDistance = 0;
-    LeftOverDistance.RightDistance = 0;
-}
-
-Motion::~Motion()
-{
-
-}
-
 
 void Motion::SetSpeed(float Speed){
     left.setMaxSpeed(Speed);
@@ -150,14 +141,14 @@ bool Motion::TargetReached(){
 /// @brief Very easy way to Enable the motors
 void Motion::Enable()
 {
-    digitalWrite(Enpin,LOW);
+    digitalWrite(PIN::Steppers::EN,LOW);
 
 }
 /// @brief Very easy way to disable the motors,
 /// this will also set the movement to 0
 void Motion::Disable(){
 
-    digitalWrite(Enpin,HIGH);
+    digitalWrite(PIN::Steppers::EN,HIGH);
     left.move(0);
     right.move(0);
 

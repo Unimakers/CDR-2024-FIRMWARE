@@ -3,7 +3,7 @@
 
 
 IHM::IHM(){
-    pinMode(TIR, INPUT_PULLUP);
+    pinMode(PIN::Inputs::TIR, INPUT_PULLUP);
     pinMode(btn1,INPUT_PULLUP);
 }
 
@@ -13,7 +13,7 @@ IHM::~IHM(){
 /// @brief Get the state of the trigger
 /// @return True if present, false if absent
 bool IHM::GetTirette(){
-    bool State = digitalRead(TIR);
+    bool State = digitalRead(PIN::Inputs::TIR);
     return !State;
 }
 /// @brief Gets the state of the lonely button

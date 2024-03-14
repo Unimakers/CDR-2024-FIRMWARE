@@ -1,9 +1,9 @@
 #pragma once
 #include <AccelStepper.h>
 
-// #ifndef _MOTION_H
-// #define _MOTION_H
-// #endif
+#ifndef _MOTION_H
+#define _MOTION_H
+#endif
 
 #define RAYON 145
 #define STEPPERMM 6.26
@@ -26,15 +26,12 @@ class Motion
 
         RobotDistance LeftOverDistance;
 
-        AccelStepper &left, &right;
+        AccelStepper left, right;
         RobotDistance DistanceToGo();
         const int Enpin = 0;
         bool PendingStop = false;
 
     public:
-        Motion(AccelStepper &L, AccelStepper &R);
-        Motion(AccelStepper &L, AccelStepper &R,int enablePin);
-        ~Motion();
         
         void SetSpeed(float Speed);
         void SetMaxAcceleration(float a);
@@ -53,7 +50,18 @@ class Motion
         void Disable();
         void Run();
 
+    //Singleton
+    public:
+        static inline Motion& instance(){return m_instance;}
 
+        Motion(const Motion&) = delete;
+        Motion(Motion&&) = delete;
+        Motion& operator=(const Motion&) = delete;
+        Motion& operator=(Motion&&) = delete;
+
+    private:
+        static Motion m_instance;
+        Motion();
 };
 
 

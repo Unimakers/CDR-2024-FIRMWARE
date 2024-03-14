@@ -4,7 +4,7 @@ SoftTimer::SoftTimer(){
 
     PreviousMillis = 0;
     Interval = 0;
-    end = false;
+    end = true;
 
 
 }

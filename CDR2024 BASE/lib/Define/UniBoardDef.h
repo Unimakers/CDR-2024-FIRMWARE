@@ -1,14 +1,27 @@
-#define TIR 8
+#pragma once
 
-#define EN 46
+namespace PIN{
+    namespace Inputs{
+        constexpr int 
+            TIR = 8,
+            btn1 = 1,
+            btn2 = 2;
+    }
 
-#define STEP1 14
-#define STEP2 12
-#define STEP3 10
+    namespace Steppers{
+        constexpr int
+            STEP1 = 14,
+            STEP2 = 12,
+            STEP3 = 10,
+            EN = 46,
+            DIR1 = 13,
+            DIR2 = 11,
+            DIR3 = 9;
+    } 
 
-#define DIR1 13
-#define DIR2 11
-#define DIR3 9
+    
+}
+
 
 #define LIDAR_TX 18
 #define LIDAR_RX 17

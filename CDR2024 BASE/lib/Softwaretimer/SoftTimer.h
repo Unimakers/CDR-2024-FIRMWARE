@@ -25,5 +25,4 @@ class SoftTimer{
         bool IsEnded();
 
 
-
 };
