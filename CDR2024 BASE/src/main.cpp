@@ -17,6 +17,7 @@
 #include <ihm.h>
 #include <ChadServo.h>
 #include <SoftTimer.h>
+#include "Debug.h"
 
 //custom wrappers
 #include <BNO08X.h>
@@ -26,8 +27,6 @@
 
 // macro for debug
 #define DEBUG 1
-
-// no reset pin for the BNO beacause we are in I²C mode
 
 // d8888b. db    db db       .d8b.  d8b   db      d8888b. d88888b      d8888b. d8888b. d88888b d888888b  .d8b.   d888b  d8b   db d88888b
 // 88  `8D `8b  d8' 88      d8' `8b 888o  88      88  `8D 88'          88  `8D 88  `8D 88'     `~~88~~' d8' `8b 88' Y8b 888o  88 88'
@@ -180,16 +179,6 @@ void LidarTask(void *pvParameters)
   }
 }
 
-void print_mesure()
-{
-  Serial.print(">lidar:");
-  Serial.print(mesure.distance * cos(mesure.angle * DEG_TO_RAD));
-  Serial.print(":");
-  Serial.print(mesure.distance * sin(mesure.angle * DEG_TO_RAD));
-  Serial.print(":");
-  Serial.println("|xy");
-}
-
 
 void setup()
 {
@@ -258,7 +247,6 @@ void setup()
 	pinMode(PIN::Nappe::NAPPE8, INPUT_PULLUP);
 }
 
-// Debug
 void HumanPeriphirals()
 {
 
@@ -293,33 +281,11 @@ void RobotPeriphirals()
     StrategyEvent();
   }
   Robot.Run();
-  //BARIL.runSpeed();
+  BARIL.Run();
 }
 
 void DisplayPeriphirals()
 {
-}
-
-// in case you want to debug the nappes, use this function!
-void debugNappes() {
-	Serial.print("NAPPE1: ");
-	Serial.println(digitalRead(PIN::Nappe::NAPPE1));
-	Serial.print("NAPPE2: ");
-	Serial.println(digitalRead(PIN::Nappe::NAPPE2));
-	Serial.print("NAPPE3: ");
-	Serial.println(digitalRead(PIN::Nappe::NAPPE3));
-	Serial.print("NAPPE4: ");
-	Serial.println(digitalRead(PIN::Nappe::NAPPE4));
-	Serial.print("NAPPE5: ");
-	Serial.println(digitalRead(PIN::Nappe::NAPPE5));
-	Serial.print("NAPPE6: ");
-	Serial.println(digitalRead(PIN::Nappe::NAPPE6));
-	Serial.print("NAPPE7: ");
-	Serial.println(digitalRead(PIN::Nappe::NAPPE7));
-	Serial.print("NAPPE8: ");
-	Serial.println(digitalRead(PIN::Nappe::NAPPE8));
-	Serial.println("============");
-	delay(1000);
 }
 
 // try to make the program modular please
@@ -334,8 +300,11 @@ void loop()
 	}
 	
   // HumanPeriphirals();  // comment or modular before match
+
   if (Armed)
   { // will only run if the robot is not manually disabled
+
     //RobotPeriphirals();
+
   }
 }
