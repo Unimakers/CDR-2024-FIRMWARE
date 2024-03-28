@@ -7,7 +7,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 AccelStepper BARIL(AccelStepper::DRIVER, STEP3, DIR3);
 
 unsigned long temps_debut_servo;
-int etape_actuelle_servo = 0;
+unsigned char etape_actuelle_servo = 0;
 
 // Scan en ping les adresses possibles afin de trouver des périphs en I2C
 void scan_i2c() {
@@ -73,11 +73,10 @@ void servo_xy(int idServo, int pourcentage) {
 void mettre_fleur_pot() {
     switch (etape_actuelle_servo) {
         case 0:
-        /*
             servo_xy(SERVO_MOVE_PINCE, 63);
             servo_xy(SERVO_PINCE_DROITE, 40);
             servo_xy(SERVO_PINCE_GAUCHE, 75);
-            */
+
             temps_debut_servo = millis();
             etape_actuelle_servo = 1;
             baril_move(75);
@@ -85,7 +84,8 @@ void mettre_fleur_pot() {
 
         case 1:
             if (millis() - temps_debut_servo >= 1000) {
-                //servo_z(SERVO_HAUTEUR, 0);
+                servo_z(SERVO_HAUTEUR, 0);
+
                 temps_debut_servo = millis();
                 etape_actuelle_servo = 2;
             }
@@ -93,8 +93,9 @@ void mettre_fleur_pot() {
 
         case 2:
             if (millis() - temps_debut_servo >= 1000) {
-                //servo_xy(SERVO_PINCE_DROITE, 15);
-                //servo_xy(SERVO_PINCE_GAUCHE, 100);
+                servo_xy(SERVO_PINCE_DROITE, 15);
+                servo_xy(SERVO_PINCE_GAUCHE, 100);
+
                 temps_debut_servo = millis();
                 etape_actuelle_servo = 3;
             }
@@ -102,7 +103,8 @@ void mettre_fleur_pot() {
 
         case 3:
             if (millis() - temps_debut_servo >= 1000) {
-                //servo_z(SERVO_HAUTEUR, 100);
+                servo_z(SERVO_HAUTEUR, 100);
+
                 temps_debut_servo = millis();
                 etape_actuelle_servo = 4;
                 baril_move(25);
@@ -111,7 +113,8 @@ void mettre_fleur_pot() {
 
         case 4:
             if (millis() - temps_debut_servo >= 1000) {
-                //servo_xy(SERVO_MOVE_PINCE, 3);
+                servo_xy(SERVO_MOVE_PINCE, 3);
+
                 temps_debut_servo = millis();
                 etape_actuelle_servo = 5;
             }
@@ -119,8 +122,9 @@ void mettre_fleur_pot() {
 
         case 5:
             if (millis() - temps_debut_servo >= 1000) {
-                //servo_xy(SERVO_PINCE_DROITE, 35);
-                //servo_xy(SERVO_PINCE_GAUCHE, 65);
+                servo_xy(SERVO_PINCE_DROITE, 35);
+                servo_xy(SERVO_PINCE_GAUCHE, 65);
+
                 temps_debut_servo = millis();
                 etape_actuelle_servo = 6;
             }
@@ -128,7 +132,8 @@ void mettre_fleur_pot() {
 
         case 6:
             if (millis() - temps_debut_servo >= 1000) {
-                //servo_xy(SERVO_MOVE_PINCE, 63);
+                servo_xy(SERVO_MOVE_PINCE, 63);
+
                 etape_actuelle_servo = 0;
             }
             break;
