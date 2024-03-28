@@ -328,7 +328,7 @@ void loop()
 	static bool test = true;
 
 	if (test) {
-		Robot.initCurrentCoords();
+		Robot.initCurrentCoords('B', 3);
 		BARIL.Probe();
 		test = false;
 	}

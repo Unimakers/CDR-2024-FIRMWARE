@@ -48,7 +48,7 @@ class Motion
         void SetSpeed(float Speed);
         void SetMaxAcceleration(float a);
         void SetCurrentCoords(int x, int y, float o);
-        void initCurrentCoords();
+        void initCurrentCoords(char color, int zone);
 
         bool TargetReached();
 
