@@ -30,140 +30,94 @@ void Motion::SetCurrentCoords(int x, int y, float o){
     CurrentCords.o = o;
 }
 
-void Motion::initCurrentCoords(char color, int zone) {
-	switch (color) {
-		case 'B':
-			switch (zone) {
-				case 1:
-					MoveLine(-250); // going backward to x axis
-					while (!TargetReached()) {
-						Run();
-					}
+void Motion::initCurrentCoords(int zone) {
+	// zone = 1 -> côté gauche
+	// zone = 2 -> centre
+	// zone = 3 -> côté droit
+	switch (zone) {
+		case 1:
+			MoveLine(-225); // going backward to x axis
+			while (!TargetReached()) {
+				Run();
+			}
 
-					MoveLine(100); // going forward to the center
-					while (!TargetReached()) {
-						Run();
-					}
+			MoveLine(100); // going forward to the center
+			while (!TargetReached()) {
+				Run();
+			}
 
-					Turn(90); // let's face the y axis
-					while (!TargetReached()) {
-						Run();
-					}
+			Turn(90); // let's face the y axis
+			while (!TargetReached()) {
+				Run();
+			}
 
-					MoveLine(-250); // going backward to y axis
-					while (!TargetReached()) {
-						Run();
-					}
+			MoveLine(-225); // going backward to y axis
+			while (!TargetReached()) {
+				Run();
+			}
 
-					MoveLine(100); // going forward to the center
-					while (!TargetReached()) {
-						Run();
-					}
+			MoveLine(100); // going forward to the center
+			while (!TargetReached()) {
+				Run();
+			}
 
-					Turn(-45); // let's face the flowers
-					while (!TargetReached()) {
-						Run();
-					}
-
-					break;
-
-				case 2:
-					MoveLine(100); // going forward to the center
-					while (!TargetReached()) {
-						Run();
-					}
-
-					Turn(25); // let's face the flowers we want
-					while (!TargetReached()) {
-						Run();
-					}
-
-					break;
-
-				case 3:
-					MoveLine(-250); // going backward to x axis
-					while (!TargetReached()) {
-						Run();
-					}
-
-					MoveLine(100); // going forward to the center
-					while (!TargetReached()) {
-						Run();
-					}
-
-					Turn(-90); // let's face the y axis
-					while (!TargetReached()) {
-						Run();
-					}
-
-					MoveLine(-250); // going backward to y axis
-					while (!TargetReached()) {
-						Run();
-					}
-
-					MoveLine(100); // going forward to the center
-					while (!TargetReached()) {
-						Run();
-					}
-
-					Turn(45); // let's face the flowers
-					while (!TargetReached()) {
-						Run();
-					}
-
-					break;
+			Turn(-45); // let's face the flowers
+			while (!TargetReached()) {
+				Run();
 			}
 
 			break;
-		case 'Y':
-			switch (zone) {
 
+		case 2:
+			MoveLine(100); // going forward to the center
+			while (!TargetReached()) {
+				Run();
+			}
+
+			Turn(25); // let's face the flowers we want
+			while (!TargetReached()) {
+				Run();
 			}
 
 			break;
+
+		case 3:
+			MoveLine(-225); // going backward to x axis
+			while (!TargetReached()) {
+				Run();
+			}
+
+			MoveLine(100); // going forward to the center
+			while (!TargetReached()) {
+				Run();
+			}
+
+			Turn(-90); // let's face the y axis
+			while (!TargetReached()) {
+				Run();
+			}
+
+			MoveLine(-225); // going backward to y axis
+			while (!TargetReached()) {
+				Run();
+			}
+
+			MoveLine(100); // going forward to the center
+			while (!TargetReached()) {
+				Run();
+			}
+
+			Turn(45); // let's face the flowers
+			while (!TargetReached()) {
+				Run();
+			}
+
+			break;
+
 		default:
-			Serial.println("Erreur couleur team pour initCurrentCoords");
+			Serial.println("Erreur initCurrentCoords (la bonne zone est-elle sélectionnée ? [1, 2, 3])");
 			break;
 	}
-
-
-	/*
-	MoveLine(-250); // going backward to x axis
-
-		do {
-			Run();
-		} while (!TargetReached());
-
-		MoveLine(100); // going forward to the center
-
-		do {
-			Run();
-		} while (!TargetReached());
-
-		Turn(90); // 90° turn
-
-		do {
-			Run();
-		} while (!TargetReached());
-
-		MoveLine(-250); // going backward to y axis
-
-		do {
-			Run();
-		} while (!TargetReached());
-
-		MoveLine(100); // going forward to the center
-
-		do {
-			Run();
-		} while (!TargetReached());
-
-		Turn(-45);
-
-		do {
-			Run();
-		} while (!TargetReached());
-	*/
 }
 
 void Motion::TurnTo(float deg){
