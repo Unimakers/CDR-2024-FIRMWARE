@@ -48,7 +48,7 @@ class Motion
         void SetSpeed(float Speed);
         void SetMaxAcceleration(float a);
         void SetCurrentCoords(int x, int y, float o);
-        void initCurrentCoords(int x, int y, float o);
+        void initCurrentCoords();
 
         bool TargetReached();
 
@@ -82,5 +82,3 @@ class Motion
         static Motion m_instance;
         Motion();
 };
-
-

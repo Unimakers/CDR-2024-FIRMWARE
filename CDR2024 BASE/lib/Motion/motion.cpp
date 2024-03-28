@@ -30,6 +30,44 @@ void Motion::SetCurrentCoords(int x, int y, float o){
     CurrentCords.o = o;
 }
 
+void Motion::initCurrentCoords() {
+	MoveLine(-300); // going backward to x axis
+
+	do {
+		Run();
+	} while (!TargetReached());
+
+	MoveLine(100); // going forward to the center
+
+	do {
+		Run();
+	} while (!TargetReached());
+
+	Turn(90); // 90° turn
+
+	do {
+		Run();
+	} while (!TargetReached());
+
+	MoveLine(-300); // going backward to y axis
+
+	do {
+		Run();
+	} while (!TargetReached());
+
+	MoveLine(100); // going forward to the center
+
+	do {
+		Run();
+	} while (!TargetReached());
+
+	Turn(-45);
+
+	do {
+		Run();
+	} while (!TargetReached());
+}
+
 void Motion::TurnTo(float deg){
     Turn(deg-CurrentCords.o);
     CurrentCords.o = deg;

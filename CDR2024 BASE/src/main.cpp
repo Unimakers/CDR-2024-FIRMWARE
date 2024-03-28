@@ -24,6 +24,9 @@
 #include <motion.h>
 #include "Baril.h"
 
+// macro for debug
+#define DEBUG 1
+
 // no reset pin for the BNO beacause we are in I²C mode
 
 // d8888b. db    db db       .d8b.  d8b   db      d8888b. d88888b      d8888b. d8888b. d88888b d888888b  .d8b.   d888b  d8b   db d88888b
@@ -65,6 +68,15 @@ bool Armed = true;
 // Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 
 // unsigned long previous_millis_servo = 0;
+
+// TO-DO
+/*
+void debug() {
+	if (DEBUG) {
+		Serial.println()
+	}
+}
+*/
 
 void reset_point()
 {
@@ -232,9 +244,18 @@ void setup()
   delay(1000);
   Robot.Enable();
 
-  // Robot.Disable();
+  //Robot.Disable();
   Serial.println("Steppers start");
 
+
+	pinMode(PIN::Nappe::NAPPE1, INPUT_PULLUP);
+	pinMode(PIN::Nappe::NAPPE2, INPUT_PULLUP);
+	pinMode(PIN::Nappe::NAPPE3, INPUT_PULLUP);
+	pinMode(PIN::Nappe::NAPPE4, INPUT_PULLUP);
+	pinMode(PIN::Nappe::NAPPE5, INPUT_PULLUP);
+	pinMode(PIN::Nappe::NAPPE6, INPUT_PULLUP);
+	pinMode(PIN::Nappe::NAPPE7, INPUT_PULLUP);
+	pinMode(PIN::Nappe::NAPPE8, INPUT_PULLUP);
 }
 
 // Debug
@@ -279,12 +300,42 @@ void DisplayPeriphirals()
 {
 }
 
+// in case you want to debug the nappes, use this function!
+void debugNappes() {
+	Serial.print("NAPPE1: ");
+	Serial.println(digitalRead(PIN::Nappe::NAPPE1));
+	Serial.print("NAPPE2: ");
+	Serial.println(digitalRead(PIN::Nappe::NAPPE2));
+	Serial.print("NAPPE3: ");
+	Serial.println(digitalRead(PIN::Nappe::NAPPE3));
+	Serial.print("NAPPE4: ");
+	Serial.println(digitalRead(PIN::Nappe::NAPPE4));
+	Serial.print("NAPPE5: ");
+	Serial.println(digitalRead(PIN::Nappe::NAPPE5));
+	Serial.print("NAPPE6: ");
+	Serial.println(digitalRead(PIN::Nappe::NAPPE6));
+	Serial.print("NAPPE7: ");
+	Serial.println(digitalRead(PIN::Nappe::NAPPE7));
+	Serial.print("NAPPE8: ");
+	Serial.println(digitalRead(PIN::Nappe::NAPPE8));
+	Serial.println("============");
+	delay(1000);
+}
+
 // try to make the program modular please
 void loop()
 {
+	static bool test = true;
+
+	if (test) {
+		Robot.initCurrentCoords();
+		BARIL.Probe();
+		test = false;
+	}
+	
   // HumanPeriphirals();  // comment or modular before match
   if (Armed)
   { // will only run if the robot is not manually disabled
-    RobotPeriphirals();
+    //RobotPeriphirals();
   }
 }

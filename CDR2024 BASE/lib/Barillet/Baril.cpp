@@ -18,17 +18,40 @@ void Baril::Init(){
 
 }
 
+// ugly code
 void Baril::Probe(){
-    motor.move(400);
+	motor.move(150);
+
+	while (motor.distanceToGo() != 0) {
+		Run();
+	}
+
+    motor.move(1600);
 
 	do {
 		Run();
-	} while (!isCalibrated);
+	} while (!isCalibrated());
+
+	motor.move(50);
+
+	while (motor.distanceToGo() != 0) {
+		Run();
+	}
 }
 
 bool Baril::isCalibrated(){
-
-
+	switch (digitalRead(PIN::Nappe::NAPPE1)) {
+		case 0:
+			return true;
+			break;
+		case 1:
+			return false;
+			break;
+		default:
+			Serial.println("Impossible de lire le capteur NAPPE1");
+			return false;
+			break;
+	}
 }
 
 void Baril::Run(){
