@@ -1,10 +1,21 @@
+#pragma once
+
 #include <Arduino.h>
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <AccelStepper.h>
+#include "Baril.h"
+
+  /*
+      MOTEUR PIN 1 : réglage hauteur,      bas ~150 haut ~450
+      MOTEUR PIN 2 : réglage pince droite, droite ~450 gauche ~150
+      MOTEUR PIN 3 : réglage pince gauche, droite ~450 gauche ~150
+      MOTEUR PIN 4 : réglage angle,        droite ~150 gauche ~450
+  */
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
-AccelStepper BARIL(AccelStepper::DRIVER, STEP3, DIR3);
+
+Baril& BARIL = Baril::instance(); 
 
 unsigned long temps_debut_servo;
 unsigned char etape_actuelle_servo = 0;

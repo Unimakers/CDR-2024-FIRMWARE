@@ -1,21 +1,45 @@
-#define TIR 8
+#pragma once
 
-#define EN 46
+namespace PIN{
+    namespace Inputs{
+        constexpr int 
+            TIR = 8,
+            btn1 = 1,
+            btn2 = 2;
+    }
+    namespace Steppers{
+        constexpr int
+            STEP1 = 14,
+            STEP2 = 12,
+            STEP3 = 10,
+            EN = 46,
+            DIR1 = 13,
+            DIR2 = 11,
+            DIR3 = 9;
+    } 
+    namespace Lidar{
+        constexpr int
+             LIDAR_TX = 18,
+             LIDAR_RX = 17,
+             LIDAR_PWM = 3;
+            
+    }
 
-#define STEP1 14
-#define STEP2 12
-#define STEP3 10
+    namespace I2C{
+        constexpr int
+            SDA = 5,
+            SCL = 4;
 
-#define DIR1 13
-#define DIR2 11
-#define DIR3 9
+    }
+    namespace Nappe{
+        constexpr int
+            Nappe1 = 21;
 
-#define LIDAR_TX 18
-#define LIDAR_RX 17
-#define LIDAR_PWM 3
+    }
 
-#define SDA 5
-#define SCL 4
+    
+}
+
 
 #define btn1 1
 #define btn2 2

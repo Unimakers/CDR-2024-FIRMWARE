@@ -1,25 +1,18 @@
 #include "motion.h"
+//Board Carateritics
+#include "UniBoardDef.h"
 
+Motion Motion::m_instance;
 
-Motion::Motion(AccelStepper &L, AccelStepper &R):left(L), right(R)
+Motion::Motion() : left(AccelStepper::DRIVER, PIN::Steppers::STEP1, PIN::Steppers::DIR1), right(AccelStepper::DRIVER, PIN::Steppers::STEP2, PIN::Steppers::DIR2)
 {
+    pinMode(PIN::Steppers::EN,OUTPUT);
+    digitalWrite(PIN::Steppers::EN, HIGH);
+    left.setPinsInverted(true);
+    right.setPinsInverted(true);
     LeftOverDistance.LeftDistance = 0;
     LeftOverDistance.RightDistance = 0;
 }
-
-Motion::Motion(AccelStepper &L, AccelStepper &R,int enablePin):left(L), right(R),Enpin(enablePin)
-{
-    pinMode(Enpin,OUTPUT);
-    digitalWrite(Enpin, HIGH);
-    LeftOverDistance.LeftDistance = 0;
-    LeftOverDistance.RightDistance = 0;
-}
-
-Motion::~Motion()
-{
-
-}
-
 
 void Motion::SetSpeed(float Speed){
     left.setMaxSpeed(Speed);
@@ -31,12 +24,63 @@ void Motion::SetMaxAcceleration(float a){
     right.setAcceleration(a);
 }
 
+void Motion::SetCurrentCoords(int x, int y, float o){
+    CurrentCords.x = x;
+    CurrentCords.y = y; //set the offset of the robot
+    CurrentCords.o = o;
+}
+
+void Motion::TurnTo(float deg){
+    Turn(deg-CurrentCords.o);
+    CurrentCords.o = deg;
+    
+}
+/// @brief Calculates and makes the robot face a certain point defined by x and y, distance or coordinates
+/// @param x x coordinates
+/// @param y y coordinates
+/// @param calculate if the x and y distances are not calulated then true, false if already a distance
+void Motion::TurnTo(int x, int y, bool calculate){
+    float Angle;
+    if(calculate){
+        x= x-CurrentCords.x;
+        y= y-CurrentCords.y;
+    }
+    Angle = atan2(y,x);
+    Turn(Angle - CurrentCords.o);
+    CurrentCords.o = Angle;
+
+}
+
+
+/// @brief Turns to the given point then move to it
+/// @param x 
+/// @param y 
+/// @return 
+bool Motion::Go_to(int x, int y){
+    static bool hasOnce= false;
+    int dx = x-CurrentCords.x;
+    int dy = y-CurrentCords.y;
+    if(!hasOnce){
+        TurnTo(dx, dy, false);
+        hasOnce = true;
+        return false;
+    }else{
+        MoveLine((int)sqrt(dx*dx+dy*dy));
+        hasOnce = false;
+        return true;
+    }
+
+}
+
+
+
+
 /// @brief Makes the robot move in a straight line
 /// @param distance the distance in steps to do, will be in mm in future version as seen in next functions
 void Motion::MoveLine(int distance){
-    
+    distance = distance * STEPPERMM;
     left.move(distance);
-    right.move(-distance);
+    right.move(distance);
 }
 /// @brief Makes the robot turn auround on its center point
 /// @param angle The relative angle of rotation
@@ -47,7 +91,7 @@ void Motion::Turn(int angle){
     int MMToDo = (2*3.14*angle*RAYON)/360;
     int StepsToDo = MMToDo*STEPPERMM;
     left.move(StepsToDo);
-    right.move(StepsToDo);
+    right.move(-StepsToDo);
 }
 
 // verifier si les signes sont dans le bon sens lors du mise en route officielle
@@ -61,8 +105,8 @@ void Motion::MoveArc(int side , int angle, int radius){
     int BigArc = radius+halfRayon;
     int SmallArc = radius-halfRayon;
 
-    int MMtoDoBigArc = (2*3.14*angle*BigArc)/360;
-    int MMtoDoSmallArc = (2*3.14*angle*SmallArc)/360;
+    int MMtoDoBigArc = (2*3.14*angle*BigArc)/180;
+    int MMtoDoSmallArc = (2*3.14*angle*SmallArc)/180;
     
     int StepsToDoBigArc = MMtoDoBigArc*STEPPERMM;
     int StepsToDoSmallArc = MMtoDoSmallArc*STEPPERMM;
@@ -78,6 +122,7 @@ void Motion::MoveArc(int side , int angle, int radius){
         break;
         default:
             Serial.println("error, no declared type of arc movement");
+        break;
     }
 }
 
@@ -149,14 +194,14 @@ bool Motion::TargetReached(){
 /// @brief Very easy way to Enable the motors
 void Motion::Enable()
 {
-    digitalWrite(Enpin,LOW);
+    digitalWrite(PIN::Steppers::EN,LOW);
 
 }
 /// @brief Very easy way to disable the motors,
 /// this will also set the movement to 0
 void Motion::Disable(){
 
-    digitalWrite(Enpin,HIGH);
+    digitalWrite(PIN::Steppers::EN,HIGH);
     left.move(0);
     right.move(0);
 
