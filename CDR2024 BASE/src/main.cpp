@@ -1,34 +1,30 @@
+//community libraries
 #include <Arduino.h>
 #include <RPLidar.h>
 #include <HardwareSerial.h>
 #include <AccelStepper.h>
+#include <Adafruit_PWMServoDriver.h>
 
 //Board Carateritics
 #include <UniBoardDef.h>
-
 
 #include <chrono>
 #include <time.h>
 #include <chrono.h>
 
-
-#include <ChadServo.h>
-#include <Adafruit_PWMServoDriver.h>
-#include <SPI.h>
-#include <SoftTimer.h>
-
 //custom libraries
 #include <Strategy.h>
 #include <ihm.h>
+#include <ChadServo.h>
+#include <SoftTimer.h>
 
 //custom wrappers
 #include <BNO08X.h>
-#include <UdpWrapper.h>
+//#include <UdpWrapper.h>
 #include <motion.h>
+#include "Baril.h"
 
 // no reset pin for the BNO beacause we are in I²C mode
-#define BNO08X_RESET -1
-
 
 // d8888b. db    db db       .d8b.  d8b   db      d8888b. d88888b      d8888b. d8888b. d88888b d888888b  .d8b.   d888b  d8b   db d88888b
 // 88  `8D `8b  d8' 88      d8' `8b 888o  88      88  `8D 88'          88  `8D 88  `8D 88'     `~~88~~' d8' `8b 88' Y8b 888o  88 88'
@@ -86,11 +82,8 @@ bool ANGLE_IN_RANGE()
   return false;
 }
 
-
-
 //A square hitbox function
 bool ANGLE_IN_RANGE_SQUARE(){
-
   if (mesure.angle >= 70 && mesure.angle <= 110)
   {
     if (mesure.distance < DIST_OBSTACLE/sin(mesure.angle))
@@ -99,7 +92,6 @@ bool ANGLE_IN_RANGE_SQUARE(){
     }
   }
   return false;
-
 }
 
 void obstacle()
@@ -131,17 +123,6 @@ void obstacle()
   }
 }
 
-// bool check_target(int dist_target, int angle_to_check) {
-//     if (mesure.distance < dist_target + 100 && mesure.distance > dist_target - 100) {
-//         if (mesure.angle < angle_to_check + 10 && mesure.angle > angle_to_check - 10) {
-//             led(1);
-//             //delay(50);
-//             return true ;
-//         }
-//     }
-//     led(0);
-//     return false;
-// }
 
 void get_point_lidar()
 {
@@ -183,7 +164,7 @@ void LidarTask(void *pvParameters)
   for (;;)
   {
     get_point_lidar();
-    ServoCooldown.updateTimer(); // temporairement ici car veux m'assurer qu'elle est run
+    //ServoCooldown.updateTimer(); // temporairement ici car veux m'assurer qu'elle est run
   }
 }
 
@@ -201,17 +182,17 @@ void print_mesure()
 void setup()
 {
   // bind the RPLIDAR driver to the arduino hardware serial
-  Strat = BLUE;
-  lidar.begin(mySerial);
+  Strat = YELLOW;
+  lidar.begin(mySerial,PIN::Lidar::LIDAR_RX,PIN::Lidar::LIDAR_TX);
   Serial.begin(115200);
 
-  Wire.begin(5, 4);
-  scan_i2c();
+  Wire.begin(PIN::I2C::SDA, PIN::I2C::SCL);
 
+  scan_i2c();
   // BNO initialisation
-  BNO_init();
+  //BNO_init();
   // Wifi Udp Initialistation
-  UDP_init();
+  //UDP_init();
 
   // Servos
   pwm.begin();
@@ -223,7 +204,7 @@ void setup()
   analogWrite(RPLIDAR_MOTOR, SPEED_MOTOR_LIDAR); // start the rplidar motor
 
   // send Ok Command over udp
-  UDPSendInfo(200);
+  //UDPSendInfo(200);
 
   Serial.println("Begin code");
   delay(2000);
@@ -232,10 +213,6 @@ void setup()
   Robot.SetMaxAcceleration(1000.0);
   Robot.SetSpeed(2500.0);
 
-  BARIL.setAcceleration(200.0);
-  BARIL.setMaxSpeed(100.0);
-  
-  BARIL.setSpeed(50);
 
   //Attach lidar to core 0
   xTaskCreatePinnedToCore(LidarTask, "lidarTask", 10000, NULL, 0, NULL, 0);
@@ -276,13 +253,11 @@ void ObstacleHandle()
     if (tmp_status)
     {
       Robot.Stop();
-      UDPSendInfo(300);
       // Serial.println("Obst, stopping");
     }
     else
     {
       Robot.Resume();
-      UDPSendInfo(100);
       // Serial.println("NO-Obst, resuming");
     }
     old_status_obstacle = tmp_status; // if the 2nd core changes status obstacle right before this command, it becomes bugged, thats why we use tmp_status
@@ -297,7 +272,7 @@ void RobotPeriphirals()
     StrategyEvent();
   }
   Robot.Run();
-  BARIL.runSpeed();
+  //BARIL.runSpeed();
 }
 
 void DisplayPeriphirals()

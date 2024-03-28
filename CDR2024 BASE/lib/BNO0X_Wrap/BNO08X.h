@@ -5,6 +5,7 @@
 
 #define BNO08X_RESET -1
 
+
 extern struct euler_t {
   float yaw;
   float pitch;

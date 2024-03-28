@@ -54,6 +54,8 @@ public:
 
     // open the given serial interface and try to connect to the RPLIDAR
     void begin(HardwareSerial &serialobj);
+    // open the given serial interface and try to connect to the RPLIDAR and giving the pins for the UART interface for GPIOmatrix microcontrollers
+    void begin(HardwareSerial &serialobj,int RX, int TX);
 
     // close the currently opened serial interface
     void end();

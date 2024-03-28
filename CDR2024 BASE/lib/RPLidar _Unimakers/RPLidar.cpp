@@ -52,7 +52,17 @@ void RPLidar::begin(HardwareSerial &serialobj)
     }
     _bined_serialdev = &serialobj;
     _bined_serialdev->end();
-    _bined_serialdev->begin(RPLIDAR_SERIAL_BAUDRATE, SERIAL_8N1,17,18); //attention le code ici est changé
+    _bined_serialdev->begin(RPLIDAR_SERIAL_BAUDRATE, SERIAL_8N1);
+}
+
+void RPLidar::begin(HardwareSerial &serialobj,int RX, int TX)
+{
+    if (isOpen()) {
+      end(); 
+    }
+    _bined_serialdev = &serialobj;
+    _bined_serialdev->end();
+    _bined_serialdev->begin(RPLIDAR_SERIAL_BAUDRATE, SERIAL_8N1,RX,TX); //attention le code ici est changé
 }
 
 // close the currently opened serial interface

@@ -8,6 +8,8 @@ Motion::Motion() : left(AccelStepper::DRIVER, PIN::Steppers::STEP1, PIN::Stepper
 {
     pinMode(PIN::Steppers::EN,OUTPUT);
     digitalWrite(PIN::Steppers::EN, HIGH);
+    left.setPinsInverted(true);
+    right.setPinsInverted(true);
     LeftOverDistance.LeftDistance = 0;
     LeftOverDistance.RightDistance = 0;
 }
@@ -21,6 +23,57 @@ void Motion::SetMaxAcceleration(float a){
     left.setAcceleration(a);
     right.setAcceleration(a);
 }
+
+void Motion::SetCurrentCoords(int x, int y, float o){
+    CurrentCords.x = x;
+    CurrentCords.y = y; //set the offset of the robot
+    CurrentCords.o = o;
+}
+
+void Motion::TurnTo(float deg){
+    Turn(deg-CurrentCords.o);
+    CurrentCords.o = deg;
+    
+}
+/// @brief Calculates and makes the robot face a certain point defined by x and y, distance or coordinates
+/// @param x x coordinates
+/// @param y y coordinates
+/// @param calculate if the x and y distances are not calulated then true, false if already a distance
+void Motion::TurnTo(int x, int y, bool calculate){
+    float Angle;
+    if(calculate){
+        x= x-CurrentCords.x;
+        y= y-CurrentCords.y;
+    }
+    Angle = atan2(y,x);
+    Turn(Angle - CurrentCords.o);
+    CurrentCords.o = Angle;
+
+}
+
+
+/// @brief Turns to the given point then move to it
+/// @param x 
+/// @param y 
+/// @return 
+bool Motion::Go_to(int x, int y){
+    static bool hasOnce= false;
+    int dx = x-CurrentCords.x;
+    int dy = y-CurrentCords.y;
+    if(!hasOnce){
+        TurnTo(dx, dy, false);
+        hasOnce = true;
+        return false;
+    }else{
+        MoveLine((int)sqrt(dx*dx+dy*dy));
+        hasOnce = false;
+        return true;
+    }
+
+}
+
+
+
 
 /// @brief Makes the robot move in a straight line
 /// @param distance the distance in steps to do, will be in mm in future version as seen in next functions

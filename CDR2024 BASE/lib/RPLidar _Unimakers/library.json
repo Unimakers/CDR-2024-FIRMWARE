@@ -1,6 +1,6 @@
 {
-    "name": "RPLidar (DanCrank fork)",
-    "version": "1.0.2",
+    "name": "RPLidar (Unimakers Fork)",
+    "version": "1.0.3",
     "description": "Local fork of RPLidar driver",
     "keywords": "lidar, rplidar",
     "repository":

@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <AccelStepper.h>
+#include "Baril.h"
 
   /*
       MOTEUR PIN 1 : réglage hauteur,      bas ~150 haut ~450
@@ -13,7 +14,8 @@
   */
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
-AccelStepper BARIL(AccelStepper::DRIVER, PIN::Steppers::STEP3, PIN::Steppers::DIR3);
+
+Baril& BARIL = Baril::instance(); 
 
 unsigned long temps_debut_servo;
 int etape_actuelle_servo = 0;

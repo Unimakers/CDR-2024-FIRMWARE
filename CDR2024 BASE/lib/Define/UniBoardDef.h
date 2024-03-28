@@ -7,7 +7,6 @@ namespace PIN{
             btn1 = 1,
             btn2 = 2;
     }
-
     namespace Steppers{
         constexpr int
             STEP1 = 14,
@@ -18,17 +17,29 @@ namespace PIN{
             DIR2 = 11,
             DIR3 = 9;
     } 
+    namespace Lidar{
+        constexpr int
+             LIDAR_TX = 18,
+             LIDAR_RX = 17,
+             LIDAR_PWM = 3;
+            
+    }
+
+    namespace I2C{
+        constexpr int
+            SDA = 5,
+            SCL = 4;
+
+    }
+    namespace Nappe{
+        constexpr int
+            Nappe1 = 21;
+
+    }
 
     
 }
 
-
-#define LIDAR_TX 18
-#define LIDAR_RX 17
-#define LIDAR_PWM 3
-
-#define SDA 5
-#define SCL 4
 
 #define btn1 1
 #define btn2 2

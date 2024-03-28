@@ -1,5 +1,5 @@
 #pragma once
-#ifndef STRATEGY_H
+#ifndef _STRATEGY_H
 #define _STRATEGY_H
 #endif
 
@@ -21,7 +21,7 @@ typedef enum
   YELLOW
 } Strategy;
 
-Strategy Strat = BLUE;
+Strategy Strat = YELLOW;
 
 void BlueStrategy()
 {
@@ -29,22 +29,26 @@ void BlueStrategy()
   switch (state)
   {
   case 0:
-    Robot.MoveLine(-1000);
-    //servo_z(1,0);
-    // servo_xy(2,80);
-    // servo_xy(3,30);
+    //Robot.MoveLine(-1000);
+    ServoCooldown.SetTimer(1000);
+    ServoCooldown.StartTimer();
+    servo_z(1,0);
+    servo_xy(2,80);
+    servo_xy(3,30);
     state++;
     break;
   case 1:
-    // ServoCooldown.SetTimer(500);
-    // ServoCooldown.StartTimer();
-    // servo_xy(2,35);
-    // servo_xy(3,65);
+    ServoCooldown.SetTimer(1000);
+    ServoCooldown.StartTimer();
+    servo_xy(2,35);
+    servo_xy(3,65);
     state++;
     break;
   case 2:
-    Robot.MoveLine(1000);
-    // servo_z(1,50);
+    //Robot.MoveLine(1000);
+    ServoCooldown.SetTimer(1000);
+    ServoCooldown.StartTimer();
+    servo_z(1,50);
     state++;
     break;
   default:
@@ -59,18 +63,36 @@ void YellowStrategy()
   switch (state)
   {
   case 0:
-    HandleBNO();
-    ServoCooldown.SetTimer(1000);
-    ServoCooldown.StartTimer();
-    UDPSendPolar(ypr.yaw);
+    Robot.MoveLine(1000);
     state++;
     break;
-
+  case 1:
+    Robot.MoveLine(-1000);
+    state++;
+    break;
   default:
-    state = 0;
     break;
   }
 }
+
+
+
+//setInitilisation
+void initStrategy(){
+  switch (Strat)
+  {
+  case BLUE:
+
+    break;
+  case YELLOW:
+    /* code */
+    break;
+  
+  default:
+    break;
+  }
+}
+
 
 void StrategyEvent()
 {
