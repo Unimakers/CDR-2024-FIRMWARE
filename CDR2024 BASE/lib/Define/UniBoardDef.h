@@ -33,7 +33,7 @@ namespace PIN{
     }
     namespace Nappe{
         constexpr int
-            Nappe1 = 21;
+            NAPPE1 = 21;
 
     }
 

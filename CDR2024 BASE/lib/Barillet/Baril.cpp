@@ -9,7 +9,7 @@ Baril::Baril() : motor(AccelStepper::DRIVER, PIN::Steppers::STEP3, PIN::Steppers
     motor.setPinsInverted(false);
     motor.setMaxSpeed(100);
     motor.setAcceleration(200);
-    pinMode(PIN::Nappe::Nappe1);
+    pinMode(PIN::Nappe::NAPPE1, INPUT_PULLUP);
     
 }
 
@@ -20,9 +20,13 @@ void Baril::Init(){
 
 void Baril::Probe(){
     motor.move(400);
+
+	do {
+		Run();
+	} while (!isCalibrated);
 }
 
-bool Baril::isProbing(){
+bool Baril::isCalibrated(){
 
 
 }
