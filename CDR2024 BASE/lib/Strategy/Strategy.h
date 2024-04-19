@@ -9,11 +9,17 @@
 #include "SoftTimer.h"
 #include "motion.h"
 #include "ChadServo.h"
+#include "UniBoardDefV4.h"
 
 
 SoftTimer ServoCooldown;
 
 Motion& Robot = Motion::instance();
+
+PinceAscenseur PinceGauche(PIN::PinceGauche::Z,PIN::PinceGauche::DOIGTGAUCE,PIN::PinceGauche::DOIGTDROITE,PIN::PinceGauche::POLAR);
+PinceAscenseur PinceDroite(PIN::PinceDroite::Z,PIN::PinceDroite::DOIGTGAUCHE,PIN::PinceDroite::DOIGTDROITE,PIN::PinceDroite::POLAR);
+
+
 
 typedef enum
 {
@@ -29,26 +35,55 @@ void BlueStrategy()
   switch (state)
   {
   case 0:
-    //Robot.MoveLine(-1000);
+
+    PinceGauche.grab();
+    PinceDroite.grab();
+
+    PinceGauche.lift();
+    PinceDroite.lift();
+
     ServoCooldown.SetTimer(1000);
     ServoCooldown.StartTimer();
-    servo_z(1,0);
-    servo_xy(2,80);
-    servo_xy(3,30);
     state++;
     break;
   case 1:
+    PinceGauche.turnIn();
+    PinceDroite.turnIn();
+   
+
+
     ServoCooldown.SetTimer(1000);
     ServoCooldown.StartTimer();
-    servo_xy(2,35);
-    servo_xy(3,65);
     state++;
     break;
-  case 2:
-    //Robot.MoveLine(1000);
+  case 2: 
+    PinceGauche.ungrab();
+    PinceDroite.ungrab();
+   
+
+
     ServoCooldown.SetTimer(1000);
     ServoCooldown.StartTimer();
-    servo_z(1,50);
+    state++;
+    break;
+  case 3:
+    PinceGauche.turnOut();
+    PinceDroite.turnOut();
+   
+
+
+    ServoCooldown.SetTimer(1000);
+    ServoCooldown.StartTimer();
+    state++;
+    break;
+  case 4:
+    PinceGauche.drop();
+    PinceDroite.drop();
+   
+
+
+    ServoCooldown.SetTimer(1000);
+    ServoCooldown.StartTimer();
     state++;
     break;
   default:
@@ -63,13 +98,47 @@ void YellowStrategy()
   switch (state)
   {
   case 0:
-    Robot.MoveLine(1000);
+    if(Robot.Go_to(650,950)==true){
+      state++;
+      PinceGauche.ungrab();
+      PinceDroite.ungrab();
+      PinceGauche.drop();
+      PinceDroite.drop();
+      PinceGauche.turnOut();
+      PinceDroite.turnOut();
+      Serial.println("Etape1");
+    }
+    
+    break;
+  case 1 :
+    PinceGauche.grab();
+    PinceDroite.grab();
+    ServoCooldown.SetTimer(1000);
+    ServoCooldown.StartTimer();
+    Serial.println("Etape2");
+    state++;
+
+   break;
+  case 2:
+    PinceGauche.lift();
+    PinceDroite.lift();
+    PinceGauche.turnIn();
+    PinceDroite.turnIn();
+    ServoCooldown.SetTimer(1000);
+    ServoCooldown.StartTimer();
+    Serial.println("Etape3");
     state++;
     break;
-  case 1:
-    Robot.MoveLine(-1000);
+  case 3 :
+  if(Robot.Go_to(650,75)==true){
+       state++;
+     }
+  break;
+  case 4:
+    PinceGauche.ungrab();
+    PinceDroite.ungrab();
     state++;
-    break;
+
   default:
     break;
   }
@@ -81,10 +150,39 @@ void YellowStrategy()
 void initStrategy(){
   switch (Strat)
   {
-  case BLUE:
+  case YELLOW:
+    Robot.SetCurrentCoords(250,250,0);
+    Robot.MoveLine(-200);
+    while (!Robot.TargetReached())
+    {
+      Robot.Run();
+    }
+    Robot.MoveLine(116);
+    while (!Robot.TargetReached())
+    {
+      Robot.Run();
+    }
+    Robot.Turn(-90);
+    while (!Robot.TargetReached())
+    {
+      Robot.Run();
+    }
+    Robot.MoveLine(-250);
+    while (!Robot.TargetReached())
+    {
+      Robot.Run();
+    }
+    Robot.MoveLine(116);
+    while (!Robot.TargetReached())
+    {
+      Robot.Run();
+    }
+    
+    
+
 
     break;
-  case YELLOW:
+  case BLUE:
     /* code */
     break;
   

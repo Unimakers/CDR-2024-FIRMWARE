@@ -16,6 +16,7 @@ class Baril
         void Init();
         void Probe();
         void moveTo(int pourcentage);
+        void Quarter();
 
         bool isCalibrated();
 

@@ -1,4 +1,4 @@
-#include "UniBoardDef.h"
+#include <UniBoardDefV4.h>
 #include <Arduino.h>
 
 // in case you want to debug the nappes, use this function!
@@ -24,12 +24,51 @@ void debugNappes() {
 }
 
 
-void print_mesure()
-{
-  Serial.print(">lidar:");
-  Serial.print(mesure.distance * cos(mesure.angle * DEG_TO_RAD));
-  Serial.print(":");
-  Serial.print(mesure.distance * sin(mesure.angle * DEG_TO_RAD));
-  Serial.print(":");
-  Serial.println("|xy");
+// void print_mesure()
+// {
+//   Serial.print(">lidar:");
+//   Serial.print(mesure.distance * cos(mesure.angle * DEG_TO_RAD));
+//   Serial.print(":");
+//   Serial.print(mesure.distance * sin(mesure.angle * DEG_TO_RAD));
+//   Serial.print(":");
+//   Serial.println("|xy");
+// }
+
+// Scan en ping les adresses possibles afin de trouver des périphs en I2C
+void scan_i2c() {
+    unsigned char error, address;
+    int nDevices = 0;
+
+    Serial.println("Scan...");
+
+    for (address = 1; address < 127; address++) {
+        Wire.beginTransmission(address);
+        error = Wire.endTransmission();
+
+        if (error == 0) {
+            Serial.print("I2C found, address: 0x");
+
+            if (address < 16) {
+                Serial.print("0");
+            }
+
+            Serial.println(address, HEX);
+            nDevices++;
+        } else if (error == 4) {
+            Serial.print("Unknown error at address: 0x");
+
+            if (address < 16) {
+                Serial.print("0");
+            }
+
+            Serial.println(address, HEX);
+        }
+    }
+
+    if (nDevices == 0) {
+        Serial.println("No I2C found");
+    } else {
+        Serial.print("nDevices: ");
+        Serial.println(nDevices);
+    }
 }

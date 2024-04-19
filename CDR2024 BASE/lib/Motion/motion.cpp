@@ -1,6 +1,7 @@
 #include "motion.h"
 //Board Carateritics
-#include "UniBoardDef.h"
+#include <UniBoardDefV4.h>
+
 
 Motion Motion::m_instance;
 
@@ -131,13 +132,30 @@ void Motion::TurnTo(float deg){
 /// @param calculate if the x and y distances are not calulated then true, false if already a distance
 void Motion::TurnTo(int x, int y, bool calculate){
     float Angle;
+    float Dangle;
     if(calculate){
-        x= x-CurrentCords.x;
-        y= y-CurrentCords.y;
+        x= (x-CurrentCords.x);
+        y= (y-CurrentCords.y);
     }
-    Angle = atan2(y,x);
-    Turn(Angle - CurrentCords.o);
+    Serial.println("CurrentCoords");
+    Serial.println(CurrentCords.x);
+    Serial.println(CurrentCords.y);
+    Serial.println(CurrentCords.o);
+
+
+    Serial.println("Calculated");
+    Serial.println(x);
+    Serial.println(y);
+
+    Serial.println("Angle");
+    Angle = (float)atan2(y,x)*180.0/PI;
+    Serial.println(Angle);
+
+    Dangle = Angle - CurrentCords.o;
+    Serial.println(Dangle);
     CurrentCords.o = Angle;
+
+    Turn(Dangle);
 
 }
 
@@ -150,6 +168,7 @@ bool Motion::Go_to(int x, int y){
     static bool hasOnce= false;
     int dx = x-CurrentCords.x;
     int dy = y-CurrentCords.y;
+
     if(!hasOnce){
         TurnTo(dx, dy, false);
         hasOnce = true;
@@ -157,6 +176,8 @@ bool Motion::Go_to(int x, int y){
     }else{
         MoveLine((int)sqrt(dx*dx+dy*dy));
         hasOnce = false;
+        CurrentCords.x= x;
+        CurrentCords.y = y;
         return true;
     }
 

@@ -1,7 +1,8 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"name": "CDR2024 BASE",
+			"path": "../.."
 		}
 	],
 	"settings": {

@@ -1,13 +1,14 @@
 
 #include "Baril.h"
-#include "UniBoardDef.h"
+#include <UniBoardDefV4.h>
+
 
 Baril Baril::m_instance;
 
-Baril::Baril() : motor(AccelStepper::DRIVER, PIN::Steppers::STEP3, PIN::Steppers::DIR3){
+Baril::Baril() : motor(AccelStepper::DRIVER, PIN::Steppers::STEP4, PIN::Steppers::DIR4){
 
     motor.setPinsInverted(false);
-    motor.setMaxSpeed(100);
+    motor.setMaxSpeed(200);
     motor.setAcceleration(200);
     pinMode(PIN::Nappe::NAPPE1, INPUT_PULLUP);
     
@@ -15,18 +16,24 @@ Baril::Baril() : motor(AccelStepper::DRIVER, PIN::Steppers::STEP3, PIN::Steppers
 
 void Baril::Init(){
 
+    Probe();
+    motor.setMaxSpeed(4000);
+    motor.setAcceleration(2000);
 
 }
 
 // ugly code
 void Baril::Probe(){
-	motor.move(150);
+    
+	if(isCalibrated()){
+		motor.move(-100);
+	}
 
 	while (motor.distanceToGo() != 0) {
 		Run();
 	}
 
-    motor.move(1600);
+    motor.move(2600);
 
 	do {
 		Run();
@@ -37,6 +44,8 @@ void Baril::Probe(){
 	while (motor.distanceToGo() != 0) {
 		Run();
 	}
+
+	
 }
 
 bool Baril::isCalibrated(){
@@ -54,8 +63,12 @@ bool Baril::isCalibrated(){
 	}
 }
 
+
+void Baril::Quarter(){
+    motor.move(400);
+
+}
+
 void Baril::Run(){
-
-
     motor.run();
 }

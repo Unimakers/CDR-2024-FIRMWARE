@@ -6,7 +6,7 @@
 #include <Adafruit_PWMServoDriver.h>
 
 //Board Carateritics
-#include <UniBoardDef.h>
+#include <UniBoardDefV4.h>
 
 #include <chrono>
 #include <time.h>
@@ -15,7 +15,7 @@
 //custom libraries
 #include <Strategy.h>
 #include <ihm.h>
-#include <ChadServo.h>
+//#include <ChadServo.h>
 #include <SoftTimer.h>
 #include "Debug.h"
 
@@ -59,14 +59,16 @@ typedef struct
 
 STRUCT_LIDAR_MESURE mesure;
 
+Baril& BARIL = Baril::instance();
+
+
+
 
 bool status_obstacle = false;
 bool old_status_obstacle = false;
 bool Armed = true;
 
 // Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
-
-// unsigned long previous_millis_servo = 0;
 
 // TO-DO
 /*
@@ -134,7 +136,6 @@ void obstacle()
   }
 }
 
-
 void get_point_lidar()
 {
   if (IS_OK(lidar.waitPoint()))
@@ -169,6 +170,7 @@ void get_point_lidar()
     }
   }
 }
+
 // pour commit
 void LidarTask(void *pvParameters)
 {
@@ -179,15 +181,40 @@ void LidarTask(void *pvParameters)
   }
 }
 
-
 void setup()
 {
+ //Nappe intialisation for when used
+
+ pinMode(PIN::Nappe::NAPPE1, INPUT_PULLUP);
+	// pinMode(PIN::Nappe::NAPPE2, INPUT_PULLUP);
+	// pinMode(PIN::Nappe::NAPPE3, INPUT_PULLUP);
+	// pinMode(PIN::Nappe::NAPPE4, INPUT_PULLUP);
+	// pinMode(PIN::Nappe::NAPPE5, INPUT_PULLUP);
+	// pinMode(PIN::Nappe::NAPPE6, INPUT_PULLUP);
+	// pinMode(PIN::Nappe::NAPPE7, INPUT_PULLUP);
+	// pinMode(PIN::Nappe::NAPPE8, INPUT_PULLUP);
+
+
   // bind the RPLIDAR driver to the arduino hardware serial
-  Strat = YELLOW;
+  Strat = BLUE;
   lidar.begin(mySerial,PIN::Lidar::LIDAR_RX,PIN::Lidar::LIDAR_TX);
   Serial.begin(115200);
 
   Wire.begin(PIN::I2C::SDA, PIN::I2C::SCL);
+  PinceGauche.begin();
+  PinceGauche.setTurnLimits(0,75);
+  PinceDroite.begin();
+  PinceDroite.setTurnLimits(25,100);
+  PinceDroite.invertPolarLimits();
+
+  PinceDroite.invertZLimits();
+
+
+
+
+  Physical.Buzzer();
+  
+  delay(1000);
 
   scan_i2c();
   // BNO initialisation
@@ -196,9 +223,6 @@ void setup()
   //UDP_init();
 
   // Servos
-  pwm.begin();
-  pwm.setOscillatorFrequency(25000000); // https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library/blob/master/examples/servo/servo.ino#L49
-  pwm.setPWMFreq(SERVO_FREQ_HZ);
 
 
   pinMode(RPLIDAR_MOTOR, OUTPUT);
@@ -208,43 +232,51 @@ void setup()
   //UDPSendInfo(200);
 
   Serial.println("Begin code");
-  delay(2000);
+  delay(1000);
 
   // inialise steppers
-  Robot.SetMaxAcceleration(1000.0);
-  Robot.SetSpeed(2500.0);
-
+  Robot.SetMaxAcceleration(MOUVEMENT_SPEED);
+  Robot.SetSpeed(MOUVEMENT_ACCELERATION);
 
   //Attach lidar to core 0
   xTaskCreatePinnedToCore(LidarTask, "lidarTask", 10000, NULL, 0, NULL, 0);
 
+
+  Robot.SetCurrentCoords(250,250,0);
+
   Serial.println("Waiting for insert tirrette");
 
-  while (!Physical.GetButton(1))
+  Physical.Buzzer();
+
+  while (!Physical.GetTirette())
   {
+    if(!Physical.GetButton(1)){
+      Serial.println("Intiialisation barrilet");
+      Robot.Enable();
+      BARIL.Probe();
+      initStrategy();
+      Robot.Disable();
+    }
+
+
   }
+
+  Robot.Enable();
+  Physical.Buzzer();
+
 
   Serial.println("Waiting for remove tirrette");
   delay(1000); // wait for stable connection
-  while (Physical.GetButton(1))
+  while (Physical.GetTirette())
   {
   }
 
-  delay(1000);
-  Robot.Enable();
 
   //Robot.Disable();
   Serial.println("Steppers start");
 
 
-	pinMode(PIN::Nappe::NAPPE1, INPUT_PULLUP);
-	pinMode(PIN::Nappe::NAPPE2, INPUT_PULLUP);
-	pinMode(PIN::Nappe::NAPPE3, INPUT_PULLUP);
-	pinMode(PIN::Nappe::NAPPE4, INPUT_PULLUP);
-	pinMode(PIN::Nappe::NAPPE5, INPUT_PULLUP);
-	pinMode(PIN::Nappe::NAPPE6, INPUT_PULLUP);
-	pinMode(PIN::Nappe::NAPPE7, INPUT_PULLUP);
-	pinMode(PIN::Nappe::NAPPE8, INPUT_PULLUP);
+
 }
 
 void HumanPeriphirals()
@@ -291,20 +323,12 @@ void DisplayPeriphirals()
 // try to make the program modular please
 void loop()
 {
-	static bool test = true;
-
-	if (test) {
-		Robot.initCurrentCoords(1);
-		BARIL.Probe();
-		test = false;
-	}
-	
   // HumanPeriphirals();  // comment or modular before match
-
   if (Armed)
   { // will only run if the robot is not manually disabled
 
-    //RobotPeriphirals();
+    RobotPeriphirals();
+    ServoCooldown.updateTimer();
 
   }
 }

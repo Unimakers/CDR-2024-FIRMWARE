@@ -4,7 +4,8 @@
 #endif
 
 #include <Arduino.h>
-#include <UniBoardDef.h>
+#include <UniBoardDefV4.h>
+
 
 
 
@@ -14,5 +15,6 @@ class IHM{
         ~IHM();
         bool GetTirette();
         bool GetButton(int btn);
+        void Buzzer();
 
 };
