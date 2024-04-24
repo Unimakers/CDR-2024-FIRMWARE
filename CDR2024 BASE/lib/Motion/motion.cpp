@@ -31,7 +31,7 @@ void Motion::SetCurrentCoords(int x, int y, float o){
     CurrentCords.o = o;
 }
 
-void Motion::initCurrentCoords(int zone) {
+void Motion::initCurrentCoords(char a, int zone) {
 	// zone = 1 -> côté gauche
 	// zone = 2 -> centre
 	// zone = 3 -> côté droit
