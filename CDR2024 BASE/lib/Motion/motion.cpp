@@ -199,11 +199,11 @@ void Motion::Turn(int angle){
     // la formule de longeur d'un arc de cercle (la distance a parcourir pour une roue)
     // est 2*Pi*A**R/360, il faudrait voir si il n'existe pas de formules sans divisions
 
-    int MMToDo = (2*3.14*angle*RAYON)/360;
+    int MMToDo = angle*RAYON*DEG_TO_RAD;
     int StepsToDo = MMToDo*STEPPERMM;
     left.move(StepsToDo);
     right.move(-StepsToDo);
-}
+}   
 
 // verifier si les signes sont dans le bon sens lors du mise en route officielle
 

@@ -6,7 +6,7 @@
 #endif
 
 #define RAYON 145
-#define STEPPERMM 6.26
+#define STEPPERMM 6.3291139241
 
 #define width 145
 #define length 100
