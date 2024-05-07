@@ -8,8 +8,8 @@ Baril Baril::m_instance;
 Baril::Baril() : motor(AccelStepper::DRIVER, PIN::Steppers::STEP4, PIN::Steppers::DIR4){
 
     motor.setPinsInverted(false);
-    motor.setMaxSpeed(200);
-    motor.setAcceleration(200);
+    motor.setMaxSpeed(1000);
+    motor.setAcceleration(2000);
     pinMode(PIN::Nappe::NAPPE1, INPUT_PULLUP);
     
 }
@@ -17,8 +17,8 @@ Baril::Baril() : motor(AccelStepper::DRIVER, PIN::Steppers::STEP4, PIN::Steppers
 void Baril::Init(){
 
     Probe();
-    motor.setMaxSpeed(4000);
-    motor.setAcceleration(2000);
+    motor.setMaxSpeed(1000);
+    motor.setAcceleration(4000);
 
 }
 
@@ -39,7 +39,7 @@ void Baril::Probe(){
 		Run();
 	} while (!isCalibrated());
 
-	motor.move(50);
+	motor.move(60);
 
 	while (motor.distanceToGo() != 0) {
 		Run();
@@ -64,11 +64,28 @@ bool Baril::isCalibrated(){
 }
 
 
+
 void Baril::Quarter(){
     motor.move(400);
 
 }
 
+void Baril::Half(){
+	motor.move(800);
+
+}
+
 void Baril::Run(){
     motor.run();
+}
+
+
+bool Baril::TargetReached(){
+	if(motor.distanceToGo()== 0){
+		return true;
+
+	}
+	return false;
+
+
 }

@@ -50,7 +50,8 @@ namespace PIN{
             Z = 1,
             DOIGTGAUCE = 3,
             DOIGTDROITE = 2,
-            POLAR = 4;
+            POLAR = 4,
+            Flipper=0;
             
     }
 
@@ -59,7 +60,8 @@ namespace PIN{
             Z = 14,
             DOIGTGAUCHE = 12,
             DOIGTDROITE = 13,
-            POLAR = 11;
+            POLAR = 11,
+            Flipper = 15;
     }
 
     

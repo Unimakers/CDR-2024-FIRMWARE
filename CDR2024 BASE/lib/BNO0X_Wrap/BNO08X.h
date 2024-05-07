@@ -28,7 +28,6 @@ void BNO_init(){
 
 }
 
-
 void HandleBNO(){
 
   if (bno08x.wasReset()) {

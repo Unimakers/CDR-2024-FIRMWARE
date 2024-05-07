@@ -17,10 +17,13 @@ class Baril
         void Probe();
         void moveTo(int pourcentage);
         void Quarter();
+        void Half();
 
         bool isCalibrated();
 
         void Run();
+
+        bool TargetReached();
 
 
 

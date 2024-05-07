@@ -59,16 +59,10 @@ typedef struct
 
 STRUCT_LIDAR_MESURE mesure;
 
-Baril& BARIL = Baril::instance();
-
-
-
 
 bool status_obstacle = false;
 bool old_status_obstacle = false;
 bool Armed = true;
-
-// Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 
 // TO-DO
 /*
@@ -196,47 +190,57 @@ void setup()
 
 
   // bind the RPLIDAR driver to the arduino hardware serial
-  Strat = BLUE;
+  Strat = YELLOW;
   lidar.begin(mySerial,PIN::Lidar::LIDAR_RX,PIN::Lidar::LIDAR_TX);
   Serial.begin(115200);
+  Serial.setTxTimeoutMs(10);
 
   Wire.begin(PIN::I2C::SDA, PIN::I2C::SCL);
   PinceGauche.begin();
   PinceGauche.setTurnLimits(0,75);
+  PinceGauche.setLiftLimits(70, 100);
+
   PinceDroite.begin();
-  PinceDroite.setTurnLimits(25,100);
+  PinceDroite.setTurnLimits(10,100);
+  PinceDroite.setLiftLimits(0, 50);
   PinceDroite.invertPolarLimits();
 
   PinceDroite.invertZLimits();
 
+  PinceGauche.toggleflip();
+
+  PinceDroite.flipin();
+  PinceGauche.flipin();
 
 
+
+  PinceDroite.dropPlanters();
+  PinceGauche.dropPlanters();
 
   Physical.Buzzer();
+
   
-  delay(1000);
+  delay(500);
 
-  scan_i2c();
-  // BNO initialisation
-  //BNO_init();
-  // Wifi Udp Initialistation
-  //UDP_init();
-
-  // Servos
+  PinceGauche.turnOut();
+  PinceDroite.turnOut();
+  delay(500);
+  //PinceGauche.drop();
+  //PinceDroite.drop();
 
 
   pinMode(RPLIDAR_MOTOR, OUTPUT);
   analogWrite(RPLIDAR_MOTOR, SPEED_MOTOR_LIDAR); // start the rplidar motor
-
   // send Ok Command over udp
-  //UDPSendInfo(200);
 
   Serial.println("Begin code");
   delay(1000);
 
   // inialise steppers
-  Robot.SetMaxAcceleration(MOUVEMENT_SPEED);
-  Robot.SetSpeed(MOUVEMENT_ACCELERATION);
+  Robot.SetMaxAcceleration(1000);
+  Robot.SetSpeed(500);
+
+
 
   //Attach lidar to core 0
   xTaskCreatePinnedToCore(LidarTask, "lidarTask", 10000, NULL, 0, NULL, 0);
@@ -253,17 +257,26 @@ void setup()
     if(!Physical.GetButton(1)){
       Serial.println("Intiialisation barrilet");
       Robot.Enable();
+
       BARIL.Probe();
       initStrategy();
-      Robot.Disable();
+    }
+    if(Physical.GetButton(2)){
+        Strat = YELLOW;
+    }
+    else{
+        Strat = BLUE;
+
+
     }
 
 
   }
 
   Robot.Enable();
+  Robot.SetMaxAcceleration(MOUVEMENT_SPEED);
+  Robot.SetSpeed(MOUVEMENT_ACCELERATION);
   Physical.Buzzer();
-
 
   Serial.println("Waiting for remove tirrette");
   delay(1000); // wait for stable connection
@@ -271,11 +284,9 @@ void setup()
   {
   }
 
-
+  
   //Robot.Disable();
   Serial.println("Steppers start");
-
-
 
 }
 
@@ -307,7 +318,7 @@ void ObstacleHandle()
 
 void RobotPeriphirals()
 {
-  ObstacleHandle();
+  //ObstacleHandle();
   if (!Robot.GetPendingStop())
   { // test if there is a obstacle stop in work, if so, then do check the strategy mouvement
     StrategyEvent();

@@ -36,7 +36,6 @@ class Motion
 
         RobotDistance LeftOverDistance;
 
-        Coordonnees CurrentCords;
 
         AccelStepper left, right;
         RobotDistance DistanceToGo();
@@ -44,6 +43,9 @@ class Motion
         bool PendingStop = false;
 
     public:
+
+        Coordonnees CurrentCords;
+
         
         void SetSpeed(float Speed);
         void SetMaxAcceleration(float a);
@@ -53,6 +55,7 @@ class Motion
         bool TargetReached();
 
         void MoveLine(int distance);
+        void MoveLine(int x, int y, bool calculate);
         void MoveArc(int side , int angle, int radius);
         void Turn(int angle);
 
