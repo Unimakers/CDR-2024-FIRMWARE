@@ -32,7 +32,6 @@ void YellowStrategy()
   static int state = 0;
   switch (state)
   { 
-
     case 0: 
       Robot.SetCurrentCoords(2750,1750,180);
       PinceGauche.flipout();
@@ -45,10 +44,10 @@ void YellowStrategy()
     break;
     case 2:
      PinceGauche.flipin();
-
       if(Robot.Go_to(2750,250)){
         state++;
       }
+      Serial.printf("L'angle : %f",Robot.CurrentCords.o);
     break;
 
 

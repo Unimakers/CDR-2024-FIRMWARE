@@ -91,5 +91,5 @@ namespace PIN{
 
 
 //Related to Steppers
-#define MOUVEMENT_SPEED 4000.0
-#define MOUVEMENT_ACCELERATION 2000.0
+#define MOUVEMENT_SPEED 4000.0  //previous on homologation 4K
+#define MOUVEMENT_ACCELERATION 4000.0 //previous on homologation 2K

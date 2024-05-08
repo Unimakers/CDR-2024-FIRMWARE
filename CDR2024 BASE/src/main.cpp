@@ -15,7 +15,9 @@
 #include <chrono.h>
 
 //custom libraries
-#include <Strategy.h>
+//#include <Strategy(Homologation).h>
+#include <startegy1.h>
+
 #include <ihm.h>
 //#include <ChadServo.h>
 #include <SoftTimer.h>
@@ -85,6 +87,7 @@ void IRAM_ATTR onTimer() {
   // Your code to execute when the timer expires
   // For example, toggle an LED
   Robot.Disable();
+  Armed = false;
 
 }
 
@@ -217,11 +220,11 @@ void setup()
 
   Wire.begin(PIN::I2C::SDA, PIN::I2C::SCL);
   PinceGauche.begin();
-  PinceGauche.setTurnLimits(0,75);
+  PinceGauche.setTurnLimits(5,75);
   PinceGauche.setLiftLimits(70, 100);
 
   PinceDroite.begin();
-  PinceDroite.setTurnLimits(10,100);
+  PinceDroite.setTurnLimits(15,100);
   PinceDroite.setLiftLimits(0, 50);
   PinceDroite.invertPolarLimits();
 
@@ -232,7 +235,6 @@ void setup()
   PinceDroite.flipin();
   PinceGauche.flipin();
 
-  
   PinceDroite.lift();
   PinceGauche.lift();
 
@@ -269,7 +271,7 @@ void setup()
 
   Physical.Buzzer();
 
-  Robot.Enable();
+  //Robot.Enable();
 
 
   while (!Physical.GetTirette())
