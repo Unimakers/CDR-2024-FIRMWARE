@@ -97,7 +97,8 @@ void reset_point()
 
 bool ANGLE_IN_RANGE()
 {
-  if (/*(mesure.angle >= 250 && mesure.angle <= 290) ||*/ (mesure.angle >= 10 && mesure.angle <= 50))
+  
+  if ((mesure.angle >= 300 && mesure.angle <= 360)|| (mesure.angle >= 120 && mesure.angle <= 180))
   {
     return true;
   }
@@ -106,7 +107,7 @@ bool ANGLE_IN_RANGE()
 
 //A square hitbox function
 bool ANGLE_IN_RANGE_SQUARE(){
-  if (mesure.angle >= 70 && mesure.angle <= 110)
+  if (mesure.angle >= 300 && mesure.angle <= 360)
   {
     if (mesure.distance < DIST_OBSTACLE/sin(mesure.angle))
     {
@@ -207,7 +208,10 @@ void setup()
 
   // bind the RPLIDAR driver to the arduino hardware serial
   Strat = YELLOW;
+
+
   lidar.begin(mySerial,PIN::Lidar::LIDAR_RX,PIN::Lidar::LIDAR_TX);
+
   Serial.begin(115200);
   Serial.setTxTimeoutMs(10);
 
@@ -229,16 +233,16 @@ void setup()
   PinceGauche.flipin();
 
   
-  PinceDroite.dropPlanters();
-  PinceGauche.dropPlanters();
+  PinceDroite.lift();
+  PinceGauche.lift();
 
   Physical.Buzzer();
 
   
   delay(500);
 
-  PinceGauche.turnOut();
-  PinceDroite.turnOut();
+  PinceGauche.turnIn();
+  PinceDroite.turnIn();
 
 
 
@@ -265,7 +269,7 @@ void setup()
 
   Physical.Buzzer();
 
- Robot.Enable();
+  Robot.Enable();
 
 
   while (!Physical.GetTirette())
