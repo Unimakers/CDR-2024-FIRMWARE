@@ -31,7 +31,6 @@ bool IHM::GetButton(int btn=1){
     }
     else if (btn == 2){
     State = digitalRead(PIN::Inputs::btn2);
-    Serial.println(State);
     }
     return State;
 }

@@ -4,10 +4,12 @@
 #include <HardwareSerial.h>
 #include <AccelStepper.h>
 #include <Adafruit_PWMServoDriver.h>
+#include <esp32-hal-timer.h>
+
+
 
 //Board Carateritics
 #include <UniBoardDefV4.h>
-
 #include <chrono>
 #include <time.h>
 #include <chrono.h>
@@ -28,6 +30,9 @@
 // macro for debug
 #define DEBUG 1
 
+#define TIMER_INTERVAL 90000000
+
+
 // d8888b. db    db db       .d8b.  d8b   db      d8888b. d88888b      d8888b. d8888b. d88888b d888888b  .d8b.   d888b  d8b   db d88888b
 // 88  `8D `8b  d8' 88      d8' `8b 888o  88      88  `8D 88'          88  `8D 88  `8D 88'     `~~88~~' d8' `8b 88' Y8b 888o  88 88'
 // 88   88  `8bd8'  88      88ooo88 88V8o 88      88   88 88ooooo      88oooY' 88oobY' 88ooooo    88    88ooo88 88      88V8o 88 88ooooo
@@ -41,12 +46,15 @@
 //  ██  ██  ██      ██ ██    ██    ██      ██   ██     ██   ██    ██        ██      ██          ██   ██ ██   ██    ██
 //   ████   ██ ███████ ██    ██    ███████ ██████      ██████     ██        ███████ ███████     ██   ██ ██   ██    ██
 
+
 HardwareSerial mySerial(1);
 
 // You need to create an driver instance
 RPLidar lidar;
 // Initialise Human machine interface
 IHM Physical;
+// creates an empty pointer for the timer
+hw_timer_t *timer = NULL;
 
 // create a file named STRUCT_LIDAR_MESURE to ad the point mesure by the lidar
 typedef struct
@@ -73,6 +81,13 @@ void debug() {
 }
 */
 
+void IRAM_ATTR onTimer() {
+  // Your code to execute when the timer expires
+  // For example, toggle an LED
+  Robot.Disable();
+
+}
+
 void reset_point()
 {
   mesure.distance = 0;
@@ -82,7 +97,7 @@ void reset_point()
 
 bool ANGLE_IN_RANGE()
 {
-  if ((mesure.angle >= 250 && mesure.angle <= 290) || (mesure.angle >= 70 && mesure.angle <= 110))
+  if (/*(mesure.angle >= 250 && mesure.angle <= 290) ||*/ (mesure.angle >= 10 && mesure.angle <= 50))
   {
     return true;
   }
@@ -179,6 +194,8 @@ void setup()
 {
  //Nappe intialisation for when used
 
+
+
  pinMode(PIN::Nappe::NAPPE1, INPUT_PULLUP);
 	// pinMode(PIN::Nappe::NAPPE2, INPUT_PULLUP);
 	// pinMode(PIN::Nappe::NAPPE3, INPUT_PULLUP);
@@ -187,7 +204,6 @@ void setup()
 	// pinMode(PIN::Nappe::NAPPE6, INPUT_PULLUP);
 	// pinMode(PIN::Nappe::NAPPE7, INPUT_PULLUP);
 	// pinMode(PIN::Nappe::NAPPE8, INPUT_PULLUP);
-
 
   // bind the RPLIDAR driver to the arduino hardware serial
   Strat = YELLOW;
@@ -212,8 +228,7 @@ void setup()
   PinceDroite.flipin();
   PinceGauche.flipin();
 
-
-
+  
   PinceDroite.dropPlanters();
   PinceGauche.dropPlanters();
 
@@ -224,9 +239,7 @@ void setup()
 
   PinceGauche.turnOut();
   PinceDroite.turnOut();
-  delay(500);
-  //PinceGauche.drop();
-  //PinceDroite.drop();
+
 
 
   pinMode(RPLIDAR_MOTOR, OUTPUT);
@@ -252,6 +265,9 @@ void setup()
 
   Physical.Buzzer();
 
+ Robot.Enable();
+
+
   while (!Physical.GetTirette())
   {
     if(!Physical.GetButton(1)){
@@ -267,9 +283,7 @@ void setup()
     else{
         Strat = BLUE;
 
-
     }
-
 
   }
 
@@ -278,11 +292,22 @@ void setup()
   Robot.SetSpeed(MOUVEMENT_ACCELERATION);
   Physical.Buzzer();
 
+
   Serial.println("Waiting for remove tirrette");
   delay(1000); // wait for stable connection
   while (Physical.GetTirette())
   {
   }
+
+  timer = timerBegin(0, 80, true); 
+
+
+  timerAttachInterrupt(timer, &onTimer, true);
+
+  timerAlarmWrite(timer, TIMER_INTERVAL, false);
+
+  timerAlarmEnable(timer);
+
 
   
   //Robot.Disable();
@@ -318,7 +343,7 @@ void ObstacleHandle()
 
 void RobotPeriphirals()
 {
-  //ObstacleHandle();
+  ObstacleHandle();
   if (!Robot.GetPendingStop())
   { // test if there is a obstacle stop in work, if so, then do check the strategy mouvement
     StrategyEvent();
@@ -337,9 +362,7 @@ void loop()
   // HumanPeriphirals();  // comment or modular before match
   if (Armed)
   { // will only run if the robot is not manually disabled
-
     RobotPeriphirals();
     ServoCooldown.updateTimer();
-
   }
 }

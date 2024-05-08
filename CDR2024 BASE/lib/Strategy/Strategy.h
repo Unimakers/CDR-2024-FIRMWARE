@@ -278,12 +278,16 @@ void BlueStrategy()
     switch (state)
     {
     case 0:
-      PinceDroite.flipout();
-      Robot.MoveLine(1000);
+      Robot.MoveLine(100);
+      state++;
+      break;
+    case 1:
+      Robot.MoveLine(-100);
       state++;
       break;
 
     default:
+      state = 0;
       break;
   }
 }
