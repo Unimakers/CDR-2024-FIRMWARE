@@ -189,7 +189,6 @@ void BlueStrategy()
     break;
     case 19:
         if(Robot.Go_to(762,65)==true){
-        BARIL.Half();
         state++;
         }
       
@@ -375,7 +374,7 @@ void BlueStrategy()
     break;
 
     case 44:
-        if(Robot.Go_to(250,2000)){
+        if(Robot.Go_to(250,1975)){
             PinceGauche.lift();
             PinceDroite.lift();
             state++;
@@ -383,8 +382,8 @@ void BlueStrategy()
     break;
 
     case 45:
-        Robot.MoveLine(-200);
-        Robot.SetCurrentCoords(Robot.CurrentCords.x,2000-250,90);
+        Robot.MoveLine(-150);
+        Robot.SetCurrentCoords(Robot.CurrentCords.x,1950-200,90);
         state++;
         break;
 
@@ -402,13 +401,17 @@ void BlueStrategy()
     break;
 
     case 48:
-        if(Robot.Go_to(1250,1800)){
+        if(Robot.Go_to(1750,1900)){
             state++;
         }else{
             PinceDroite.flipout();
         }
     break;
 
+    case 49:
+      Robot.MoveLine(-1250);
+      state++;
+    break;
 
     default:
       

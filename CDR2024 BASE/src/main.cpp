@@ -101,7 +101,7 @@ void reset_point()
 bool ANGLE_IN_RANGE()
 {
   
-  if ((mesure.angle >= 300 && mesure.angle <= 360)|| (mesure.angle >= 120 && mesure.angle <= 180))
+  if ((mesure.angle >= 270 && mesure.angle <= 360)|| (mesure.angle >= 120 && mesure.angle <= 180)|| (mesure.angle >= 0 && mesure.angle <= 45))
   {
     return true;
   }
@@ -333,13 +333,14 @@ void ObstacleHandle()
   // compare si il y a eu un changement d'etat, si oui, alors agir en fonction de l'état
   if (tmp_status != old_status_obstacle)
   {
-    if (tmp_status)
-    {
+    if (tmp_status){
+      Robot.SetMaxAcceleration(7000);
       Robot.Stop();
       // Serial.println("Obst, stopping");
     }
     else
     {
+      Robot.SetMaxAcceleration(MOUVEMENT_SPEED);
       Robot.Resume();
       // Serial.println("NO-Obst, resuming");
     }
